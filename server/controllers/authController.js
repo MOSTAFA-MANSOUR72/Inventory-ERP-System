@@ -8,6 +8,7 @@ const crypto = require("crypto");
 
 const createSendToken = (user, statusCode, res) => {
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRES_IN });
+    const refreshToken = jwt.sign({ id: user._id }, process.env.JWT_REFRESH_SECRET, { expiresIn: process.env.JWT_REFRESH_EXPIRES_IN });
 
     res.cookie("jwt", token, {
         expires: new Date(Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000),
@@ -17,6 +18,7 @@ const createSendToken = (user, statusCode, res) => {
     res.status(statusCode).json({
         status: "success",
         token,
+        refreshToken,
         data: {
             user,
         },
@@ -170,4 +172,25 @@ exports.updatePassword = catchAsync(async (req, res, next) => {
 
     // 4) Log user in, send JWT
     createSendToken(user, 200, res);
+});
+
+exports.refreshToken = catchAsync(async (req, res, next) => {
+    const { refreshToken } = req.body;
+
+    if (!refreshToken) {
+        return next(new AppError("Please provide a refresh token", 400));
+    }
+
+    // 1) Verify the refresh token
+    const decoded = await promisify(jwt.verify)(refreshToken, process.env.JWT_REFRESH_SECRET);
+
+    // 2) Check if user still exists
+    const freshUser = await User.findById(decoded.id);
+
+    if (!freshUser) {
+        return next(new AppError("The user belonging to this token no longer exists", 401));
+    }
+
+    // 3) Generate new tokens (rotating the refresh token as well for better security)
+    createSendToken(freshUser, 200, res);
 });
