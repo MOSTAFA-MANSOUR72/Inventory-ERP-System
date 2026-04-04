@@ -6,14 +6,26 @@ const { promisify } = require("util");
 const sendEmail = require("../utils/mail");
 const crypto = require("crypto");
 
-exports.signup = catchAsync(async (req, res, next) => {
-    const newUser = await User.create(req.body);
-    const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRES_IN });
+const createSendToken = (user, statusCode, res) => {
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRES_IN });
 
-    res.status(201).json({
+    res.cookie("jwt", token, {
+        expires: new Date(Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000),
+        httpOnly: true
+    });
+
+    res.status(statusCode).json({
         status: "success",
         token,
+        data: {
+            user,
+        },
     });
+}
+
+exports.signup = catchAsync(async (req, res, next) => {
+    const newUser = await User.create(req.body);
+    createSendToken(newUser, 201, res);
 });
 
 exports.login = catchAsync(async (req, res, next) => {
@@ -24,15 +36,7 @@ exports.login = catchAsync(async (req, res, next) => {
         return next(new AppError("Incorrect email or password", 401));
     }
 
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRES_IN });
-
-    res.status(200).json({
-        status: "success",
-        data: {
-            user,
-        },
-        token,
-    });
+    createSendToken(user, 200, res);
 });
 
 exports.protect = catchAsync(async (req, res, next) => {
@@ -165,11 +169,5 @@ exports.updatePassword = catchAsync(async (req, res, next) => {
     await user.save();
 
     // 4) Log user in, send JWT
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRES_IN });
-
-    res.status(200).json({
-        status: "success",
-        message: "Password updated successfully",
-        token,
-    });
+    createSendToken(user, 200, res);
 });
