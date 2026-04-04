@@ -1,16 +1,19 @@
 const Express = require('express');
 const rateLimit = require('express-rate-limit');
-const userRoutes = require('./routes/userRoutes');
-const authRoutes = require('./routes/authRoutes');
 const AppErorr = require('./utils/appError')
 const globalErrorHandler = require('./controllers/errorController');
-const app = Express();
-const mongoSenitize = require("express-mongo-sanitize");
-const xss = require("xss-clean");
+const helmet = require("helmet");
 
+const authRoutes = require('./routes/authRoutes');
+const userRoutes = require('./routes/userRoutes');
+const categoryRoutes = require('./routes/categoryRoutes');
+const branchRoutes = require('./routes/branchRoutes');
+// const productRoutes = require('./routes/productRoutes');
+
+const app = Express();
 
 const limmter = rateLimit({
-  max: 100,
+  max: 1000,
   windowMs: 60 * 60 * 1000,
   message: "Too many requests from this IP, please try again in an hour!"
 });
@@ -19,16 +22,17 @@ const limmter = rateLimit({
 app.use(Express.json());
 app.use("/api", limmter);
 
-// Data sanitization against NoSQL query injection
-app.use(mongoSenitize());
-// Data sanitization against XSS
-app.use(xss());
+// Security headers
+app.use(helmet());
 
 app.use(Express.static(`${__dirname}/public`));
 
 // Routes
 app.use("/api", userRoutes);
 app.use("/api", authRoutes);
+app.use("/api", branchRoutes);
+app.use("/api/categories", categoryRoutes);
+// app.use("/api/products", productRoutes);
 
 app.get("/", (req, res) => {
   res.send("Hello World");

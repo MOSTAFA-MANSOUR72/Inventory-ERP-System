@@ -30,10 +30,18 @@ const userSchema = new mongoose.Schema({
             message: "Passwords do not match"
         }
     },
+    branch: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Branch"
+    },
+    manager: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User"
+    },
     role: {
         type: String,
         enum: ["admin", "manager", "cashier",],
-        default: "cashier",
+        default: "manager",
     },
     passwordChangedAt: {
         type: Date,
