@@ -5,9 +5,9 @@ const authRoutes = require('./routes/authRoutes');
 const AppErorr = require('./utils/appError')
 const globalErrorHandler = require('./controllers/errorController');
 const app = Express();
+const mongoSenitize = require("express-mongo-sanitize");
+const xss = require("xss-clean");
 
-// Middleware
-app.use(Express.json());
 
 const limmter = rateLimit({
   max: 100,
@@ -15,7 +15,14 @@ const limmter = rateLimit({
   message: "Too many requests from this IP, please try again in an hour!"
 });
 
+// Middleware
+app.use(Express.json());
 app.use("/api", limmter);
+
+// Data sanitization against NoSQL query injection
+app.use(mongoSenitize());
+// Data sanitization against XSS
+app.use(xss());
 
 app.use(Express.static(`${__dirname}/public`));
 
