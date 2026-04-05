@@ -9,6 +9,9 @@ const userRoutes = require('./routes/userRoutes');
 const categoryRoutes = require('./routes/categoryRoutes');
 const branchRoutes = require('./routes/branchRoutes');
 const productRoutes = require('./routes/productRoutes');
+const providerRoutes = require('./routes/ProviderRoutes');
+const contractRoutes = require('./routes/ContractRoutes');
+const sellRoutes = require('./routes/sellRoutes');
 
 const app = Express();
 
@@ -33,6 +36,9 @@ app.use("/api", authRoutes);
 app.use("/api", branchRoutes);
 app.use("/api/categories", categoryRoutes);
 app.use("/api/products", productRoutes);
+app.use("/api/providers", providerRoutes);
+app.use("/api/contracts", contractRoutes);
+app.use("/api/sales", sellRoutes);
 
 app.get("/", (req, res) => {
   res.send("Hello World");
