@@ -194,3 +194,19 @@ exports.refreshToken = catchAsync(async (req, res, next) => {
     // 3) Generate new tokens (rotating the refresh token as well for better security)
     createSendToken(freshUser, 200, res);
 });
+
+exports.getMe = catchAsync(async (req, res, next) => {
+    const user = await User.findById(req.user.id)
+        .populate("branch", "name location");
+
+    if (!user) {
+        return next(new AppError("User not found", 404));
+    }
+
+    res.status(200).json({
+        status: "success",
+        data: {
+            user,
+        },
+    });
+});
