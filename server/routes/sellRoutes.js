@@ -9,6 +9,7 @@ const {
   getDailySalesReport,
   getTopSellingProducts,
   refundReceipt,
+  getBranchInventory,
 } = require("../controllers/SellController");
 
 const { protect, restrictTo } = require("../controllers/authController");
@@ -18,6 +19,9 @@ router.use(protect);
 
 // Cashier only routes
 router.use(restrictTo("cashier"));
+
+// Get branch inventory for cashier sales
+router.get("/inventory", getBranchInventory);
 
 // Create a sale/receipt
 router.post("/", createSale);

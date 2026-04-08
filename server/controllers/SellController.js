@@ -424,3 +424,24 @@ exports.refundReceipt = catchAsync(async (req, res, next) => {
     },
   });
 });
+
+// Get branch inventory for Dropdown selection
+exports.getBranchInventory = catchAsync(async (req, res, next) => {
+  const branch = req.user.branch;
+
+  if (!branch) {
+    return next(new AppError("You are not assigned to a branch", 400));
+  }
+
+  const inventory = await InventoryProduct.find({ branch })
+    .populate("product", "name category image")
+    .sort("-createdAt");
+
+  res.status(200).json({
+    status: "success",
+    results: inventory.length,
+    data: {
+      inventory,
+    },
+  });
+});

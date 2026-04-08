@@ -1,5 +1,6 @@
 const Express = require('express');
 const rateLimit = require('express-rate-limit');
+const cors = require('cors');
 const AppErorr = require('./utils/appError')
 const globalErrorHandler = require('./controllers/errorController');
 const helmet = require("helmet");
@@ -12,8 +13,22 @@ const productRoutes = require('./routes/productRoutes');
 const providerRoutes = require('./routes/ProviderRoutes');
 const contractRoutes = require('./routes/ContractRoutes');
 const sellRoutes = require('./routes/sellRoutes');
+const inventoryRoutes = require('./routes/inventoryRoutes');
 
 const app = Express();
+
+const corsOrigins = process.env.CORS_ORIGIN
+  ? process.env.CORS_ORIGIN.split(',').map((o) => o.trim()).filter(Boolean)
+  : ['http://localhost:4200', 'http://127.0.0.1:4200'];
+
+app.use(
+  cors({
+    origin: corsOrigins,
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+  })
+);
 
 const limmter = rateLimit({
   max: 1000,
@@ -39,6 +54,7 @@ app.use("/api/products", productRoutes);
 app.use("/api/providers", providerRoutes);
 app.use("/api/contracts", contractRoutes);
 app.use("/api/sales", sellRoutes);
+app.use("/api/inventory", inventoryRoutes);
 
 app.get("/", (req, res) => {
   res.send("Hello World");
