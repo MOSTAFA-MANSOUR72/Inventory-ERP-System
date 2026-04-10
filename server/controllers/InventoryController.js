@@ -4,8 +4,10 @@ const AppError = require('../utils/appError');
 const catchAsync = require('../utils/catchAsync');
 
 exports.getInventoryProducts = catchAsync(async (req, res, next) => {
+  const { page = 1, limit = 10 } = req.query;
+  const skip = (page - 1) * limit;
   let filter = {};
-  
+
   // Admin sees all inventory
   if (req.user.role === 'admin') {
     filter = {};
@@ -21,17 +23,31 @@ exports.getInventoryProducts = catchAsync(async (req, res, next) => {
       return res.status(200).json({
         status: 'success',
         results: 0,
+        total: 0,
+        page: parseInt(page),
+        pages: 0,
         data: {
           inventoryProducts: [],
         },
       });
     }
   }
-  
-  const inventoryProducts = await InventoryProduct.find(filter).populate('product').populate('branch');
+
+  const inventoryProducts = await InventoryProduct.find(filter)
+    .populate('product')
+    .populate('branch')
+    .skip(skip)
+    .limit(parseInt(limit))
+    .sort('-createdAt');
+
+  const total = await InventoryProduct.countDocuments(filter);
+
   res.status(200).json({
     status: 'success',
     results: inventoryProducts.length,
+    total,
+    page: parseInt(page),
+    pages: Math.ceil(total / limit),
     data: {
       inventoryProducts,
     },

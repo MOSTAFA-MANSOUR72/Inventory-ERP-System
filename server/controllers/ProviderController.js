@@ -29,6 +29,8 @@ exports.createProvider = catchAsync(async (req, res, next) => {
 
 // Get all providers frm the logged in manager or cashier's manager
 exports.getAllProviders = catchAsync(async (req, res, next) => {
+  const { page = 1, limit = 10 } = req.query;
+  const skip = (page - 1) * limit;
   const userId = req.user._id;
   const userRole = req.user.role;
   const userManagerId = req.user.manager;
@@ -41,11 +43,15 @@ exports.getAllProviders = catchAsync(async (req, res, next) => {
     query.manager = userManagerId; // Cashiers see providers of their manager
   }
 
-  const providers = await Provider.find(query);
+  const providers = await Provider.find(query).skip(skip).limit(parseInt(limit)).sort('-createdAt');
+  const total = await Provider.countDocuments(query);
 
   res.status(200).json({
     status: "success",
     results: providers.length,
+    total,
+    page: parseInt(page),
+    pages: Math.ceil(total / limit),
     data: {
       providers,
     },

@@ -20,7 +20,7 @@ router.use(protect);
 router.post("/", createContract);
 
 // Get all contracts for current manager
-router.get("/", restrictTo("manager", "admin"), getContracts);
+router.get("/", getContracts);
 
 // Get single contract by ID
 router.get("/:id", getContractById);

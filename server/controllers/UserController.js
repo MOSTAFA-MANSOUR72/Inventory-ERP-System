@@ -25,9 +25,18 @@ exports.createUser = catchAsync(async (req, res, next) => {
 })
 
 exports.getAllUsers = catchAsync(async (req, res, next) => {
-  const users = await User.find();
+  const { page = 1, limit = 10 } = req.query;
+  const skip = (page - 1) * limit;
+
+  const users = await User.find().skip(skip).limit(parseInt(limit)).sort('-createdAt');
+  const total = await User.countDocuments();
+
   res.status(200).json({
     status: "success",
+    results: users.length,
+    total,
+    page: parseInt(page),
+    pages: Math.ceil(total / limit),
     data: {
       users,
     },
@@ -35,9 +44,18 @@ exports.getAllUsers = catchAsync(async (req, res, next) => {
 })
 
 exports.getAllUsersByManager = catchAsync(async (req, res, next) => {
-  const users = await User.find({ manager: req.user._id });
+  const { page = 1, limit = 10 } = req.query;
+  const skip = (page - 1) * limit;
+
+  const users = await User.find({ manager: req.user._id }).skip(skip).limit(parseInt(limit)).sort('-createdAt');
+  const total = await User.countDocuments({ manager: req.user._id });
+
   res.status(200).json({
     status: "success",
+    results: users.length,
+    total,
+    page: parseInt(page),
+    pages: Math.ceil(total / limit),
     data: {
       users,
     },

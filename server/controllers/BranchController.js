@@ -22,11 +22,23 @@ exports.createBranch = catchAsync(async (req, res, next) => {
 });
 
 exports.getAllBranches = catchAsync(async (req, res, next) => {
-    const branches = await Branch.find();
+    const { page = 1, limit = 10 } = req.query;
+    const skip = (page - 1) * limit;
+
+    let filter = {};
+    if (req.user.role === 'manager') {
+        filter.manager = req.user._id;
+    }
+
+    const branches = await Branch.find(filter).skip(skip).limit(parseInt(limit)).sort('-createdAt');
+    const total = await Branch.countDocuments(filter);
 
     res.status(200).json({
         status: "success",
         results: branches.length,
+        total,
+        page: parseInt(page),
+        pages: Math.ceil(total / limit),
         data: {
             branches,
         },
@@ -81,12 +93,19 @@ exports.updateBranch = catchAsync(async (req, res, next) => {
 });
 
 exports.getAllBranchesByManager = catchAsync(async (req, res, next) => {
+    const { page = 1, limit = 10 } = req.query;
+    const skip = (page - 1) * limit;
     const managerId = req.user._id;
-    const branches = await Branch.find({ manager: managerId });
+
+    const branches = await Branch.find({ manager: managerId }).skip(skip).limit(parseInt(limit)).sort('-createdAt');
+    const total = await Branch.countDocuments({ manager: managerId });
 
     res.status(200).json({
         status: "success",
         results: branches.length,
+        total,
+        page: parseInt(page),
+        pages: Math.ceil(total / limit),
         data: {
             branches,
         },
