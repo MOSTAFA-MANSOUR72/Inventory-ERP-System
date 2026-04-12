@@ -133,11 +133,13 @@ exports.getContractById = catchAsync(async (req, res, next) => {
   }
 
   // Verify access permissions
-  const isOwner = contract.manager.toString() === req.user._id.toString();
+  const managerId = contract.manager._id ? contract.manager._id.toString() : contract.manager.toString();
+  const isOwner = managerId === req.user._id.toString();
   const isAdmin = req.user.role === "admin";
+  const isManager = req.user.role === "manager" && isOwner;
   const isBranchCashier = req.user.role === "cashier" && contract.branch._id.toString() === req.user.branch.toString();
 
-  if (!isOwner && !isAdmin && !isBranchCashier) {
+  if (!isOwner && !isAdmin && !isManager && !isBranchCashier) {
     return next(new AppError("You do not have permission to view this contract", 403));
   }
 
@@ -160,7 +162,8 @@ exports.updateContract = catchAsync(async (req, res, next) => {
   }
 
   // Verify ownership
-  if (contract.manager.toString() !== req.user._id.toString() && req.user.role !== "admin") {
+  const updateManagerId = contract.manager._id ? contract.manager._id.toString() : contract.manager.toString();
+  if (updateManagerId !== req.user._id.toString() && req.user.role !== "admin") {
     return next(new AppError("You do not have permission to update this contract", 403));
   }
 
@@ -241,7 +244,8 @@ exports.approveContract = catchAsync(async (req, res, next) => {
   }
 
   // Verify ownership or admin
-  if (contract.manager.toString() !== req.user._id.toString() && req.user.role !== "admin") {
+  const approveManagerId = contract.manager._id ? contract.manager._id.toString() : contract.manager.toString();
+  if (approveManagerId !== req.user._id.toString() && req.user.role !== "admin") {
     return next(new AppError("You do not have permission to approve this contract", 403));
   }
 
@@ -290,7 +294,8 @@ exports.deleteContract = catchAsync(async (req, res, next) => {
   }
 
   // Verify ownership
-  if (contract.manager.toString() !== req.user._id.toString() && req.user.role !== "admin") {
+  const deleteManagerId = contract.manager._id ? contract.manager._id.toString() : contract.manager.toString();
+  if (deleteManagerId !== req.user._id.toString() && req.user.role !== "admin") {
     return next(new AppError("You do not have permission to delete this contract", 403));
   }
 
@@ -316,7 +321,8 @@ exports.cancelContract = catchAsync(async (req, res, next) => {
   }
 
   // Verify ownership
-  if (contract.manager.toString() !== req.user._id.toString() && req.user.role !== "admin") {
+  const cancelManagerId = contract.manager._id ? contract.manager._id.toString() : contract.manager.toString();
+  if (cancelManagerId !== req.user._id.toString() && req.user.role !== "admin") {
     return next(new AppError("You do not have permission to cancel this contract", 403));
   }
 
