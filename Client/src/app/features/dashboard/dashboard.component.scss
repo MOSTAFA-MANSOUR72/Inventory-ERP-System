@@ -1,0 +1,15 @@
+:host {
+  display: block;
+  /* Ensuring content is legible against the blueprint grid */
+  background: transparent;
+}
+
+// Optional: Add a subtle fade-in animation for page loads
+.animate-in {
+  animation: fadeIn 0.4s ease-out forwards;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}

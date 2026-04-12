@@ -1,0 +1,77 @@
+<div class="min-h-screen flex items-center justify-center p-6 bg-background animate-in fade-in duration-1000">
+  <div appCard class="w-full max-w-[540px] p-12 shadow-[0_40px_80px_rgba(0,0,0,0.06)] border-none">
+
+    <div class="flex flex-col items-center mb-12 text-center">
+      <div class="w-16 h-16 bg-primary/10 text-primary rounded-[1.5rem] flex items-center justify-center mb-6 shadow-sm ring-8 ring-primary/5">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+        </svg>
+      </div>
+      <h1 class="text-4xl font-extrabold text-slate-800 tracking-tight mb-2">{{ 'AUTH.SIGN_UP' | translate }}</h1>
+      <p class="text-sm font-bold text-slate-400 uppercase tracking-widest leading-none">System Access Registration</p>
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="submit()" class="space-y-5">
+
+      <div class="space-y-2">
+        <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">Full Name</label>
+        <input
+          appInput
+          type="text"
+          formControlName="name"
+          placeholder="John Doe"
+        />
+        <p *ngIf="form.controls.name.errors?.['required'] && form.controls.name.touched" class="text-rose-600 text-[10px] font-black uppercase tracking-widest mt-2">Name is required</p>
+      </div>
+
+      <div class="space-y-2">
+        <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">{{ 'AUTH.EMAIL' | translate }}</label>
+        <input
+          appInput
+          type="email"
+          formControlName="email"
+          [placeholder]="'AUTH.EMAIL_PLACEHOLDER' | translate"
+        />
+        <p *ngIf="form.controls.email.errors?.['required'] && form.controls.email.touched" class="text-rose-600 text-[10px] font-black uppercase tracking-widest mt-2">Email is required</p>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div class="space-y-2">
+          <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">{{ 'AUTH.PASSWORD' | translate }}</label>
+          <input
+            appInput
+            type="password"
+            formControlName="password"
+            placeholder="••••••••"
+          />
+          <p *ngIf="form.controls.password.errors?.['minlength'] && form.controls.password.touched" class="text-rose-600 text-[10px] font-black uppercase tracking-widest mt-2">At least 8 chars</p>
+        </div>
+
+        <div class="space-y-2">
+          <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">Confirm</label>
+          <input
+            appInput
+            type="password"
+            formControlName="confirmPassword"
+            placeholder="••••••••"
+          />
+          <p *ngIf="form.controls.confirmPassword.hasError('mismatch') && form.controls.confirmPassword.touched" class="text-rose-600 text-[10px] font-black uppercase tracking-widest mt-2">No Match</p>
+        </div>
+      </div>
+
+      <button
+        appButton
+        variant="default"
+        type="submit"
+        [disabled]="submitting || form.invalid"
+        class="w-full h-16 text-lg shadow-primary/20 shadow-xl mt-6"
+        [loading]="submitting">
+        @if (submitting) { {{ 'AUTH.SIGNING_IN' | translate }} } @else { {{ 'AUTH.SIGN_UP' | translate }} }
+      </button>
+    </form>
+
+    <div class="mt-10 pt-10 border-t border-slate-50 text-center">
+      <p class="text-sm font-bold text-slate-400">Already have an account? <a routerLink="/auth/login" class="text-primary hover:underline font-black ml-1">Sign in</a></p>
+    </div>
+  </div>
+</div>

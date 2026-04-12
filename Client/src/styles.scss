@@ -1,0 +1,338 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Color system CSS variables */
+@layer base {
+  :root {
+    /* Soft SaaS Palette (Professional Slate & Sky) */
+    --background: 220 33% 97%;    /* Deeper, cleaner Soft Slate for improved card separation */
+    --foreground: 222 47% 11%;
+    
+    --card: 0 0% 100%;            /* Stay pure white for maximum pop */
+    --card-foreground: 222 47% 11%;
+ 
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
+ 
+    --muted: 220 33% 94%;         /* Coordinated muted fills */
+    --muted-foreground: 215 16% 47%;
+ 
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222 47% 11.2%;
+ 
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 210 40% 98%;
+ 
+    --border: 222 30% 92%;        /* Crisp borders */
+    --input: 222 30% 92%;
+    
+    /* Muted Slate-Blue Primary (replacing sharp indigo) */
+    --primary: 221 83% 53%;       /* Professional Blue */
+    --primary-foreground: 210 40% 98%;
+
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222 47% 11.2%;
+
+    --ring: 221 83% 53%;
+    --radius: 1rem;               /* 16px - Large rounded corners for soft look */
+
+    /* Sidebar - Lighter and less heavy */
+    --sidebar: 210 40% 98%;
+    --sidebar-foreground: 215 16% 47%;
+    --sidebar-border: 214 32% 91%;
+
+    /* Status pills — coordinated with the soft theme */
+    --status-blue: 214 95% 93%;
+    --status-blue-foreground: 221 83% 30%;
+    --status-purple: 250 100% 97%;
+    --status-purple-foreground: 262 83% 40%;
+    --status-amber: 48 96% 89%;
+    --status-amber-foreground: 32 95% 35%;
+    --status-orange: 31 97% 92%;
+    --status-orange-foreground: 21 90% 38%;
+    --status-green: 152 76% 91%;
+    --status-green-foreground: 144 61% 28%;
+    --status-slate: 220 14% 96%;
+    --status-slate-foreground: 220 9% 40%;
+
+    /* Legacy compatibility for Auth pages */
+    --bg-main: hsl(var(--background));
+    --bg-card: hsl(var(--card));
+    --border-color: hsl(var(--border));
+    --radius-xl: 1rem;
+    --radius-md: 0.75rem;
+  }
+
+  [data-theme="dark"] {
+    --background: 222 47% 6%;     /* Even darker background */
+    --foreground: 210 40% 98%;
+    --card: 222 47% 11%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222 47% 11%;
+    --popover-foreground: 210 40% 98%;
+    --muted: 217 33% 17%;
+    --muted-foreground: 215 20% 65%;
+    --accent: 217 33% 17%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 62% 30%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217 33% 17%;
+    --input: 217 33% 17%;
+    --primary: 221 83% 53%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 217 33% 17%;
+    --secondary-foreground: 210 40% 98%;
+    --sidebar: 222 47% 4%;
+    --sidebar-foreground: 215 20% 65%;
+    --sidebar-border: 217 33% 17%;
+  }
+}
+
+@layer base {
+  * { @apply border-border/60; }
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    font-feature-settings: "rlig" 1, "calt" 1;
+    -webkit-font-smoothing: antialiased;
+  }
+}
+
+@layer components {
+  .page-container { @apply min-h-screen w-full bg-background; }
+  .page-content { @apply p-8 lg:p-10 max-w-[1600px] mx-auto; }
+  .page-title { @apply text-4xl font-extrabold tracking-tight text-slate-900; }
+  .page-subtitle { @apply text-base text-muted-foreground font-medium mt-2; }
+
+  /* Modern Table Utility */
+  /* Unified Table System */
+  .modern-table-wrapper {
+    /* Ensures the top corner rounding applies if wrapped */
+    border-radius: 12px 12px 0 0;
+    overflow: hidden;
+  }
+
+  .modern-table {
+    width: 100%;
+    text-align: left;
+    border-collapse: separate;
+    border-spacing: 0;
+
+    thead tr {
+      background-color: #F1F5F9 !important;
+    }
+
+    thead th {
+      background-color: #F1F5F9 !important;
+      border-bottom: 1px solid #E2E8F0 !important;
+      padding: 12px 20px !important;
+      color: #64748B !important;
+      font-size: 11px !important;
+      font-weight: 700 !important;
+      text-transform: uppercase !important;
+      letter-spacing: 0.08em !important;
+      
+      &:first-child {
+        border-top-left-radius: 12px !important;
+      }
+      &:last-child {
+        border-top-right-radius: 12px !important;
+      }
+    }
+
+    tbody tr {
+      background-color: #FFFFFF !important;
+      transition: background-color 0.2s ease !important;
+      
+      &:hover {
+        background-color: #F8FAFC !important;
+      }
+    }
+
+    tbody td {
+      padding: 16px 20px !important;
+      border-bottom: 1px solid #F1F5F9 !important;
+      color: #1E293B; /* Let child badges override this */
+      font-size: 14px;
+      font-weight: 500;
+      
+      /* Target specifically non-badge text to enforce styles if tailwind classes exist */
+      &.font-mono, &.text-slate-500, &.text-slate-400 {
+        color: #1E293B !important;
+        font-size: 14px !important;
+        font-weight: 500 !important;
+      }
+    }
+    
+    tbody tr:last-child td {
+      border-bottom: none !important;
+    }
+  }
+
+  /* Unified Pagination System */
+  .modern-pagination {
+    background-color: #F8FAFC !important;
+    border-top: 1px solid #E2E8F0 !important;
+    border-radius: 0 0 12px 12px !important;
+    padding: 12px 20px !important;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    
+    @media (min-width: 768px) {
+      flex-direction: row;
+    }
+
+    .pagination-info {
+      color: #64748B !important;
+      font-size: 13px !important;
+
+      span {
+        color: #1E293B !important;
+        font-weight: 700 !important;
+      }
+    }
+
+    .pagination-actions {
+      display: flex;
+      gap: 8px;
+
+      button {
+        background-color: #FFFFFF !important;
+        border: 1px solid #E2E8F0 !important;
+        color: #64748B !important;
+        border-radius: 10px !important;
+        padding: 8px 18px !important;
+        font-weight: 700 !important;
+        font-size: 13px !important;
+        transition: all 0.2s ease !important;
+        cursor: pointer;
+
+        &:hover:not(:disabled) {
+          background-color: #F1F5F9 !important;
+          color: #1E293B !important;
+          border-color: #CBD5E1 !important;
+        }
+
+        &.active, &:active:not(:disabled) {
+           background-color: #1E293B !important;
+           color: #FFFFFF !important;
+           border-color: #1E293B !important;
+        }
+
+        &:disabled {
+          opacity: 0.4 !important;
+          cursor: not-allowed !important;
+        }
+      }
+    }
+  }
+
+  .custom-scrollbar {
+    &::-webkit-scrollbar { width: 6px; height: 6px; }
+    &::-webkit-scrollbar-track { @apply bg-transparent; }
+    &::-webkit-scrollbar-thumb { @apply bg-slate-200 rounded-full hover:bg-slate-300 transition-colors; }
+  }
+}
+
+@layer utilities {
+  .shimmer {
+    background: linear-gradient(90deg, rgba(var(--muted), 0.3) 25%, rgba(var(--muted), 0.6) 37%, rgba(var(--muted), 0.3) 63%);
+    background-size: 400% 100%;
+    animation: shimmer 1.4s ease infinite;
+  }
+  @keyframes shimmer { 0% { background-position: 100% 0; } 100% { background-position: -100% 0; } }
+
+  .fade-in-up { animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+  @keyframes fadeInUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+  
+  .soft-shadow { box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.05), 0 1px 2px -1px rgb(0 0 0 / 0.05); }
+  .glass-card { @apply bg-white/70 backdrop-blur-md border border-white/20; }
+
+  /* ── Unified Unified Design System (Card, Typography, Buttons) ── */
+  
+  /* Cards */
+  .card, mat-card, .stat, .summary {
+    background-color: #FFFFFF !important;
+    border: 1px solid #E2E8F0 !important;
+    border-radius: 16px !important;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06) !important;
+  }
+
+  /* Typography */
+  .label, label, .card-label {
+    color: #64748B !important;
+    font-size: 11px !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.1em !important;
+  }
+
+  .main-number, .stat-value {
+    color: #1E293B !important;
+    font-weight: 800 !important;
+  }
+
+  .text-accent-red {
+    color: #EF4444 !important;
+  }
+
+  .text-accent-blue {
+    color: #3B82F6 !important;
+  }
+
+  /* Ghost Buttons */
+  button.ghost, .btn-ghost-base {
+    border-radius: 10px !important;
+    font-size: 13px !important;
+    font-weight: 700 !important;
+    padding: 8px 16px !important;
+    transition: all 0.2s !important;
+  }
+
+  .btn-delete {
+    color: #EF4444 !important;
+    border: 1px solid #FECACA !important;
+    background-color: transparent !important;
+  }
+  .btn-delete:hover {
+    background-color: #FEF2F2 !important;
+    color: #DC2626 !important;
+    border-color: #FCA5A5 !important;
+  }
+  .btn-delete:active {
+    background-color: #FEE2E2 !important;
+    transform: scale(0.97) !important;
+  }
+
+  .btn-approve {
+    color: #22C55E !important;
+    border: 1px solid #BBF7D0 !important;
+    background-color: transparent !important;
+  }
+  .btn-approve:hover {
+    background-color: #F0FDF4 !important;
+    color: #16A34A !important;
+    border-color: #86EFAC !important;
+  }
+  .btn-approve:active {
+    background-color: #DCFCE7 !important;
+    transform: scale(0.97) !important;
+  }
+
+  .btn-cancel {
+    color: #64748B !important;
+    border: 1px solid #E2E8F0 !important;
+    background-color: transparent !important;
+  }
+  .btn-cancel:hover {
+    background-color: #F8FAFC !important;
+    color: #1E293B !important;
+    border-color: #CBD5E1 !important;
+  }
+  .btn-cancel:active {
+    background-color: #F1F5F9 !important;
+    transform: scale(0.97) !important;
+  }
+}

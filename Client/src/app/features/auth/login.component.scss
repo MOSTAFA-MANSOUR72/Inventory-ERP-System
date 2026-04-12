@@ -1,0 +1,31 @@
+.auth-page {
+  /* Creating the professional blueprint/grid background from image_c695ee.png */
+  background-color: #fcfdfe;
+  background-image:
+    linear-gradient(#f1f5f9 1.5px, transparent 1.5px),
+    linear-gradient(90deg, #f1f5f9 1.5px, transparent 1.5px);
+  background-size: 40px 40px;
+  background-position: center center;
+
+  /* The subtle dots at the grid intersections */
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(#e2e8f0 1.2px, transparent 1.2px);
+    background-size: 40px 40px;
+    background-position: center center;
+    z-index: 0;
+  }
+
+  /* Ensure card stays above background pseudo-element */
+  > div {
+    position: relative;
+    z-index: 1;
+  }
+}
+
+/* Customizing the checkbox appearance to match the theme */
+input[type="checkbox"] {
+  accent-color: theme('colors.indigo.600');
+}

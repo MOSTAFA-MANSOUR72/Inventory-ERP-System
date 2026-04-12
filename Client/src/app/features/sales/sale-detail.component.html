@@ -1,0 +1,168 @@
+<div class="page-content space-y-12 animate-in fade-in slide-in-from-bottom-8 duration-700 pb-20">
+   <app-page-state [loading]="loading" [error]="error" (retry)="fetch()">
+      @if (receipt) {
+      <!-- Back Button -->
+      <a routerLink="/sales"
+         class="inline-flex items-center gap-3 text-slate-400 hover:text-primary font-black text-[10px] uppercase tracking-[0.2em] transition-all group">
+         <div class="w-8 h-8 rounded-full border-2 border-slate-100 flex items-center justify-center group-hover:border-primary/20 group-hover:bg-primary/5 transition-all">
+           <svg class="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" fill="none" stroke="currentColor"
+              viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18">
+              </path>
+           </svg>
+         </div>
+         Return to Ledger
+      </a>
+
+      <!-- Receipt Header -->
+      <header class="relative space-y-8 text-center pb-12 border-b-4 mb-2">
+         <div class="space-y-4">
+             <div class="flex justify-center">
+                <span
+                   class="px-5 py-2 rounded-full border-4 border-slate-50 text-[10px] font-black uppercase tracking-[0.3em] bg-white text-slate-400 shadow-sm">Official
+                   Receipt</span>
+             </div>
+            <h1 class="text-6xl font-black tracking-tighter text-slate-900">#{{ receipt.receiptNumber ||
+               receipt._id.slice(-6).toUpperCase() }}</h1>
+            <div class="flex items-center justify-center gap-6">
+               <span
+                  [class]="'px-4 py-1.5 rounded-full border-2 text-[10px] font-black uppercase tracking-widest ' + getStatusColor(receipt.status || '')">
+                  {{ receipt.status }}
+               </span>
+               <span class="text-xs font-bold text-slate-400 tracking-widest uppercase">{{ receipt.createdAt |
+                  date:'medium' }}</span>
+            </div>
+         </div>
+      </header>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-12">
+         <!-- Details Column -->
+         <div class="md:col-span-2 space-y-10">
+            <!-- Items Table -->
+             <div class="space-y-6">
+                <h3 class="text-[10px] font-black mb-1 uppercase text-slate-400 tracking-[0.2em] px-2">Purchased Manifest</h3>
+                <div appCard class="overflow-hidden border-none shadow-[0_30px_60px_rgba(0,0,0,0.03)]">
+                   <table class="modern-table">
+                      <thead>
+                        <tr>
+                           <th>Item Name</th>
+                           <th>Qty</th>
+                           <th class="text-end">Subtotal</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        @for (item of receipt.items; track $index) {
+                        <tr>
+                           <td class="px-8 py-5">
+                              <p class="font-black text-slate-900">{{ $any(item).product?.name || 'Unknown Product' }}
+                              </p>
+                              <p class="text-[10px] font-bold text-slate-400 uppercase">{{ $any(item).sellPrice |
+                                 currency }} unit price</p>
+                           </td>
+                           <td class="px-8 py-5">
+                              <span class="px-3 py-1 bg-slate-100 rounded-lg text-xs font-black text-slate-600">x{{
+                                 $any(item).quantity }}</span>
+                           </td>
+                           <td class="px-8 py-5 text-end font-black text-slate-900">
+                              {{ $any(item).totalPrice | currency }}
+                           </td>
+                        </tr>
+                        }
+                      </tbody>
+                   </table>
+                </div>
+             </div>
+
+
+            <!-- Metadata -->
+             <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div appCard class="p-10">
+                   <p class="text-[10px] font-black uppercase text-slate-400 tracking-widest mb-6">Transaction Logistics
+                   </p>
+                   <div class="space-y-5">
+                      <div class="flex justify-between items-center">
+                         <span class="text-sm font-bold text-slate-400">Operator</span>
+                         <span class="text-sm font-black text-slate-900 border-b-2 border-primary/20 pb-0.5">{{ $any(receipt.cashier)?.name || 'System'
+                            }}</span>
+                      </div>
+                      <div class="flex justify-between items-center">
+                         <span class="text-sm font-bold text-slate-400">Procurement Branch</span>
+                         <span class="text-sm font-black text-slate-900">{{ $any(receipt.branch)?.name || 'Main'
+                            }}</span>
+                      </div>
+                   </div>
+                </div>
+                <div appCard class="p-10 border-none shadow-sm">
+                   <p class="text-[10px] font-black uppercase text-slate-400 tracking-widest mb-6">Payment Core</p>
+                   <div class="space-y-5">
+                      <div class="flex justify-between items-center">
+                         <span class="text-sm font-bold text-slate-400">Method</span>
+                         <span class="text-xs font-black text-primary px-3 py-1 bg-primary/5 rounded-lg uppercase tracking-widest">{{ receipt.paymentMethod }}</span>
+                      </div>
+                      <div class="flex justify-between items-center">
+                         <span class="text-sm font-bold text-slate-400">Sync Status</span>
+                         <span class="text-[10px] font-black text-emerald-600 uppercase tracking-widest bg-emerald-50 px-3 py-1 rounded-lg">Live / Verified</span>
+                      </div>
+                   </div>
+                </div>
+             </div>
+
+             @if (receipt.notes) {
+             <div class="p-10 bg-primary/5 rounded-[2.5rem] border-none">
+                <p class="text-[10px] font-black uppercase text-primary tracking-widest mb-3">Audit Notes</p>
+                <p class="text-slate-600 font-bold leading-relaxed italic text-lg">"{{ receipt.notes }}"</p>
+             </div>
+             }
+         </div>
+
+         <!-- summary Column -->
+         <div class="space-y-8">
+             <div appCard class="p-12 bg-slate-900 text-white shadow-2xl relative overflow-hidden group">
+                <div class="relative z-10 space-y-10">
+                   <h3 class="text-3xl font-black tracking-tighter leading-none">Financial<br>Summary<span
+                         class="text-primary">.</span></h3>
+                   <div class="space-y-8">
+                      <div>
+                         <p class="text-[10px] font-black uppercase text-slate-500 tracking-widest mb-2">Total
+                            Transaction</p>
+                         <p class="text-6xl font-black tracking-tighter">{{ receipt.totalAmount | currency }}</p>
+                      </div>
+                      @if (receipt.status === 'refunded') {
+                      <div class="pt-8 border-t border-white/10">
+                         <p class="text-[10px] font-black uppercase text-rose-500 tracking-widest mb-2">Refunded Amount
+                         </p>
+                         <p class="text-4xl font-black text-rose-400 tracking-tighter">-{{ receipt.totalAmount | currency }}</p>
+                      </div>
+                      }
+                   </div>
+                </div>
+                <div
+                   class="absolute -right-20 -bottom-20 w-80 h-80 bg-primary/10 rounded-full blur-3xl group-hover:bg-primary/20 transition-all duration-700">
+                </div>
+             </div>
+
+             @if (receipt.status !== 'refunded') {
+             <div class="relative group">
+                <div appCard class="relative p-10 shadow-sm border-none">
+                   <h4 class="text-[10px] font-black uppercase text-slate-400 tracking-widest mb-6">Reversal Hub</h4>
+                   <form [formGroup]="refundForm" (ngSubmit)="refund()" class="space-y-6">
+                      <div class="space-y-2">
+                        <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">Reason for Refund</label>
+                        <input appInput formControlName="reason" placeholder="e.g. Defective item, customer request..."
+                           class="h-14" />
+                      </div>
+                      <button type="submit"
+                        appButton
+                        variant="ghost"
+                        class="w-full h-14 bg-rose-50 text-rose-600 hover:bg-rose-600 hover:text-white font-black text-xs uppercase tracking-[0.2em] shadow-sm transition-all">
+                        Issue Full Refund
+                      </button>
+                   </form>
+                </div>
+             </div>
+             }
+         </div>
+      </div>
+      }
+   </app-page-state>
+</div>

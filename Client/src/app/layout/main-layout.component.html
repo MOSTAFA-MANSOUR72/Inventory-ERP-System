@@ -1,0 +1,130 @@
+<div class="layout">
+  <aside class="sidebar" [class.-ms-80]="!sidenavOpen">
+
+    <div class="sidebar-header">
+      <div class="logo-icon">O</div>
+      <div class="logo-text">
+        <span class="logo-title">OptiFactory</span>
+        <span class="logo-sub">ERP System</span>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      @if (user$ | async; as user) {
+
+        <p class="nav-section-label">Overview</p>
+
+        <a routerLink="/dashboard"
+           [routerLinkActive]="'active'"
+           [routerLinkActiveOptions]="{ exact: true }"
+           class="nav-item">
+          <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-3m0 0l7-4 7 4M5 9v10a1 1 0 001 1h12a1 1 0 001-1V9m-9 16l4-4m0 0l4 4m-4-4v4m0-11l-4 2m4-2l4-2"></path></svg>
+          <span class="label">{{ 'SIDEBAR.DASHBOARD' | translate }}</span>
+        </a>
+
+        <p class="nav-section-label">Inventory</p>
+
+        @if (canSee(user.role, roles.notCashier)) {
+          <a routerLink="/products" [routerLinkActive]="'active'" class="nav-item">
+            <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m0 0l8 4m-8-4v10l8 4v-10m0 -5l8 4m0 0v10l-8 4v-10m0 -4l8-4"></path></svg>
+            <span class="label">{{ 'SIDEBAR.PRODUCTS' | translate }}</span>
+          </a>
+        }
+
+        <a routerLink="/inventory" [routerLinkActive]="'active'" class="nav-item">
+          <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
+          <span class="label">{{ (user.role === 'cashier' ? 'SIDEBAR.PRODUCTS' : 'SIDEBAR.INVENTORY') | translate }}</span>
+        </a>
+
+        <a routerLink="/categories" [routerLinkActive]="'active'" class="nav-item">
+          <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"></path></svg>
+          <span class="label">{{ 'SIDEBAR.CATEGORIES' | translate }}</span>
+        </a>
+
+        @if (canSee(user.role, roles.all)) {
+          <p class="nav-section-label">Logistics</p>
+
+          @if (canSee(user.role, roles.adminManager)) {
+            <a routerLink="/providers" [routerLinkActive]="'active'" class="nav-item">
+              <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+              <span class="label">{{ 'SIDEBAR.SUPPLIERS' | translate }}</span>
+            </a>
+          }
+
+          <a routerLink="/contracts" [routerLinkActive]="'active'" class="nav-item">
+            <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+            <span class="label">{{ 'SIDEBAR.CONTRACTS' | translate }}</span>
+          </a>
+        }
+
+        @if (canSee(user.role, roles.adminManager)) {
+          <p class="nav-section-label">System</p>
+
+          <a routerLink="/users" [routerLinkActive]="'active'" class="nav-item">
+            <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 12H9m6 0a6 6 0 11-12 0 6 6 0 0112 0z"></path></svg>
+            <span class="label">{{ 'SIDEBAR.USERS' | translate }}</span>
+          </a>
+
+          <a routerLink="/branches" [routerLinkActive]="'active'" class="nav-item">
+            <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
+            <span class="label">{{ 'SIDEBAR.BRANCHES' | translate }}</span>
+          </a>
+        }
+
+        @if (canSee(user.role, roles.cashierOnly)) {
+          <p class="nav-section-label">Operations</p>
+
+          <a routerLink="/sales" [routerLinkActive]="'active'" class="nav-item">
+            <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            <span class="label">{{ 'SIDEBAR.SALES' | translate }}</span>
+          </a>
+        }
+
+      }
+    </nav>
+
+    <div class="sidebar-footer">
+      <button (click)="logout()" class="btn-logout">
+        <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+        <span class="label">{{ 'SIDEBAR.LOGOUT' | translate }}</span>
+      </button>
+    </div>
+
+  </aside>
+
+  <div class="main-content">
+    <header class="topbar">
+      <div class="topbar-left">
+        <button type="button" (click)="toggleSidenav()" class="menu-toggle">
+          <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+        </button>
+        <app-breadcrumb class="hidden md:block" />
+      </div>
+
+      <div class="topbar-right">
+        <div class="search-box">
+          <svg class="search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+          <input type="text" [(ngModel)]="searchQuery" (keydown.enter)="globalSearch()" [placeholder]="'TOPBAR.SEARCH' | translate" class="search-input" />
+        </div>
+
+        <div class="topbar-actions">
+          <button (click)="toggleLanguage()" class="btn-lang">
+            {{ translationService.getCurrentLanguage() }}
+          </button>
+
+          @if (user$ | async; as user) {
+            <button (click)="toggleUserMenu()" class="user-avatar">
+              {{ user.name | slice:0:1 }}
+            </button>
+          }
+        </div>
+      </div>
+    </header>
+
+    <main class="content">
+      <div class="content-inner">
+        <router-outlet />
+      </div>
+    </main>
+  </div>
+</div>

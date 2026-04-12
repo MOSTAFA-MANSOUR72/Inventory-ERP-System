@@ -1,0 +1,136 @@
+<div class="page-content space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-700">
+  <!-- Header -->
+  <div class="flex flex-col md:flex-row md:items-center justify-between gap-8">
+    <div class="space-y-3">
+      <h1 class="page-title">{{ 'SIDEBAR.CATEGORIES' | translate }}</h1>
+      <p class="page-subtitle">{{ 'TOPBAR.OPERATOR' | translate }} - {{ 'DASHBOARD.CORE_TITLE' | translate }}</p>
+    </div>
+  </div>
+
+  <!-- Error State -->
+  @if (error && !loading) {
+    <div class="p-4 bg-destructive/10 text-destructive rounded-lg flex items-start gap-3">
+      <svg class="w-5 h-5 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"></path>
+      </svg>
+      <div>
+        <p class="font-medium">{{ error }}</p>
+        <button 
+            (click)="load()">Try again</button>
+      </div>
+    </div>
+  }
+
+  <!-- Add Category Form -->
+  @if (auth.user$ | async; as user) {
+    @if (isAdmin(user.role)) {
+      <div appCard class="p-10">
+        <div class="flex items-center gap-4 mb-8">
+          <div class="w-12 h-12 rounded-2xl bg-primary/10 text-primary flex items-center justify-center">
+             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path></svg>
+          </div>
+          <div>
+            <h2 class="text-2xl font-black text-slate-900 tracking-tight">{{ 'CATEGORIES.ADD_TITLE' | translate }}</h2>
+            <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mt-1">{{ 'CATEGORIES.ADD_DESC' | translate }}</p>
+          </div>
+        </div>
+        <form [formGroup]="createForm" (ngSubmit)="create()" class="flex flex-col md:flex-row gap-6">
+          <div class="flex-1">
+            <input
+              type="text"
+              appInput
+              formControlName="name"
+              [placeholder]="'CATEGORIES.NAME_PLACEHOLDER' | translate"
+            />
+          </div>
+          <button appButton variant="default" type="submit" [disabled]="createForm.invalid" class="px-10 h-14 shadow-primary/20 shadow-lg">
+            <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+            </svg>
+            {{ 'CATEGORIES.ADD_BTN' | translate }}
+          </button>
+        </form>
+      </div>
+    }
+  }
+
+  <!-- Loading State -->
+  @if (loading) {
+    <div appCard class="p-8 text-center">
+      <div class="inline-flex items-center justify-center">
+        <div class="w-8 h-8 rounded-full border-4 border-muted border-t-primary animate-spin"></div>
+      </div>
+      <p class="text-muted-foreground mt-2">{{ 'CATEGORIES.LOADING' | translate }}</p>
+    </div>
+  }
+
+  <!-- Empty State -->
+  @if (!loading && data.length === 0) {
+    <div appCard class="p-12 text-center">
+      <svg class="w-16 h-16 mx-auto text-muted-foreground/50 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"></path>
+      </svg>
+      <h3 class="text-lg font-semibold mb-1">{{ 'CATEGORIES.EMPTY_TITLE' | translate }}</h3>
+      <p class="text-muted-foreground">{{ 'CATEGORIES.EMPTY_DESC' | translate }}</p>
+    </div>
+  }
+
+  <!-- Categories List -->
+  @if (!loading && data.length > 0) {
+    <div appCard class="overflow-hidden border-none shadow-[0_30px_60px_rgba(0,0,0,0.03)]">
+      <div class="overflow-x-auto">
+        <table class="modern-table">
+          <thead>
+            <tr>
+              <th>{{ 'CATEGORIES.TABLE_NAME' | translate }}</th>
+              <th class="text-end">{{ 'COMMON.ACTIONS' | translate }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of data; track row._id) {
+              <tr class="hover:bg-primary/5 transition-colors">
+                <td class="text-base font-black text-slate-900">{{ row.name }}</td>
+                <td class="text-end">
+                  @if (auth.user$ | async; as user) {
+                    @if (isAdmin(user.role)) {
+                      <button appButton variant="destructive" size="sm"
+                        appButton
+                        variant="ghost"
+                        size="sm"
+                        type="button"
+                        (click)="delete(row._id)">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                        </svg>
+                        {{ 'CATEGORIES.BTN_DELETE' | translate }}
+                      </button>
+                    }
+                  }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination -->
+      <div class="modern-pagination">
+        <p class="pagination-info">
+          Showing <span class="text-slate-900">{{ pageIndex * pageSize + 1 }}</span> to <span class="text-slate-900">{{ Math.min((pageIndex + 1) * pageSize, total) }}</span> of <span class="text-primary">{{ total }}</span> items
+        </p>
+        <div class="pagination-actions">
+          <button 
+            (click)="onPage({ pageIndex: pageIndex - 1, pageSize })"
+            [disabled]="pageIndex === 0">
+            {{ 'COMMON.PREVIOUS' | translate }}
+          </button>
+          <button 
+            (click)="onPage({ pageIndex: pageIndex + 1, pageSize })"
+            [disabled]="pageIndex + 1 >= totalPages">
+            {{ 'COMMON.NEXT' | translate }}
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+</div>

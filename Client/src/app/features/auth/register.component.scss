@@ -1,0 +1,23 @@
+.auth-page {
+  background-color: #fcfdfe;
+  background-image:
+    linear-gradient(#f1f5f9 1.5px, transparent 1.5px),
+    linear-gradient(90deg, #f1f5f9 1.5px, transparent 1.5px);
+  background-size: 40px 40px;
+  background-position: center center;
+  position: relative;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(#e2e8f0 1.2px, transparent 1.2px);
+    background-size: 40px 40px;
+    background-position: center center;
+  }
+
+  > div {
+    position: relative;
+    z-index: 1;
+  }
+}

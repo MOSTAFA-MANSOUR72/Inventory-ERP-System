@@ -1,0 +1,255 @@
+<div class="page-content space-y-12 animate-in fade-in slide-in-from-bottom-8 duration-700 pb-20">
+  
+  <!-- Custom Stepper Header -->
+  <header class="relative space-y-8">
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-8">
+      <div class="space-y-3">
+        <div class="flex items-center gap-3">
+          <span class="px-3 py-1 bg-primary text-[10px] font-black text-white uppercase tracking-[0.2em] rounded-lg">Module 03</span>
+          <span class="h-px w-12 bg-slate-200"></span>
+        </div>
+        <h1 class="text-6xl font-black tracking-tighter text-slate-900 leading-none">New Contract<span class="text-primary">.</span></h1>
+        <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none">Global Procurement Cycle</p>
+      </div>
+
+      <!-- Step Indicator -->
+      <div class="flex items-center gap-4 bg-white p-3 rounded-[2rem] border-2 border-slate-100 shadow-sm">
+        <div [class]="currentStep >= 1 ? 'bg-primary shadow-lg shadow-primary/20' : 'bg-slate-50 text-slate-300'" class="w-14 h-14 rounded-2xl flex items-center justify-center text-white font-black text-xl transition-all duration-500">01</div>
+        <div class="h-1.5 w-10 bg-slate-50 rounded-full"></div>
+        <div [class]="currentStep >= 2 ? 'bg-primary shadow-lg shadow-primary/20' : 'bg-slate-50 text-slate-300'" class="w-14 h-14 rounded-2xl flex items-center justify-center text-white font-black text-xl transition-all duration-500">02</div>
+        <div class="h-1.5 w-10 bg-slate-50 rounded-full"></div>
+        <div [class]="currentStep >= 3 ? 'bg-primary shadow-lg shadow-primary/20' : 'bg-slate-50 text-slate-300'" class="w-14 h-14 rounded-2xl flex items-center justify-center text-white font-black text-xl transition-all duration-500">03</div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Step 01: Basic Details -->
+  @if (currentStep === 1) {
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-12 items-start">
+      <div class="lg:col-span-2 space-y-8">
+        <div appCard class="p-10 border-none shadow-[0_40px_80px_rgba(0,0,0,0.04)]">
+          <div class="flex items-center gap-4 mb-10 pl-2 border-l-8 border-primary">
+            <div>
+              <h2 class="text-3xl font-black text-slate-900 tracking-tight">Header Information</h2>
+              <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1">Core logistics & payment data</p>
+            </div>
+          </div>
+          <form [formGroup]="headerForm" class="space-y-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+               <div class="space-y-3">
+                <label class="text-[10px] font-black uppercase text-slate-400 tracking-widest">Payment Method</label>
+                <select appInput formControlName="paymentMethod">
+                  <option value="cash">Instant Cash</option>
+                  <option value="check">Certified Check</option>
+                  <option value="credit">Internal Credit</option>
+                  <option value="bank_transfer">Bank Wire Transfer</option>
+                </select>
+              </div>
+            </div>
+            <div class="space-y-3">
+              <label class="text-[10px] font-black uppercase text-slate-400 tracking-widest">Execution Notes</label>
+              <textarea appInput rows="4" formControlName="description" placeholder="Optional details about this procurement..."></textarea>
+            </div>
+          </form>
+        </div>
+      </div>
+      <div class="space-y-6">
+        <div appCard class="p-8 bg-slate-900 text-white rounded-[2rem] shadow-2xl overflow-hidden relative group">
+          <div class="relative z-10 space-y-4">
+            <h3 class="text-xl font-black">Instruction</h3>
+            <p class="text-slate-400 font-bold leading-relaxed text-sm">Specify the payment vehicle and any relevant background information for this contract ledger.</p>
+          </div>
+          <div class="absolute -right-10 -bottom-10 w-40 h-40 bg-indigo-500/10 rounded-full blur-3xl group-hover:bg-indigo-500/20 transition-all"></div>
+        </div>
+        <button (click)="nextStep()" [disabled]="headerForm.invalid" 
+          appButton
+          variant="default"
+          class="w-full h-20 text-xl shadow-primary/20 shadow-2xl">
+          Continue to Products
+          <svg class="w-6 h-6 ml-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+        </button>
+      </div>
+    </div>
+  }
+
+  <!-- Step 02: Product Selection -->
+  @if (currentStep === 2) {
+    <div class="space-y-12">
+      <!-- Product Grid -->
+      <div class="space-y-6">
+        <div class="flex items-center justify-between">
+           <div class="flex items-center gap-4 pl-2 border-l-8 border-primary">
+             <div>
+               <h2 class="text-3xl font-black text-slate-900 tracking-tighter">manifest lines<span class="text-primary text-5xl">.</span></h2>
+               <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1">Specify items & pricing</p>
+             </div>
+           </div>
+           <button appButton variant="add" size="sm" (click)="addLine()" 
+             appButton
+             variant="ghost">
+             <svg class="w-5 h-5 mr-1 group-hover:rotate-90 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+             Add Line Item
+           </button>
+        </div>
+
+        <div class="grid grid-cols-1 gap-10">
+          @for (line of lines.controls; track $index) {
+            <div [formGroup]="$any(line)" class="group relative bg-white border-2 border-slate-50 p-10 rounded-[2.5rem] hover:border-primary/30 hover:bg-primary/[0.02] transition-all duration-500 shadow-sm hover:shadow-[0_40px_80px_rgba(0,0,0,0.03)]">
+              <div class="grid grid-cols-12 gap-8 items-end">
+                <div class="col-span-12 lg:col-span-4 space-y-3">
+                  <label class="text-[10px] font-black uppercase text-slate-400 tracking-widest px-1">Selected Product</label>
+                  <select appInput formControlName="product" class="h-[54px] border-slate-200">
+                    <option value="" disabled>Search Catalog...</option>
+                    @for (p of productOptions; track p._id) {
+                      <option [value]="p._id">{{ p.name }}</option>
+                    }
+                  </select>
+                </div>
+                <div class="col-span-4 lg:col-span-2 space-y-3">
+                   <label class="text-[10px] font-black uppercase text-slate-400 tracking-widest px-1">Quantity</label>
+                   <input appInput type="number" formControlName="quantity" class="h-[54px] text-center font-black"/>
+                </div>
+                <div class="col-span-4 lg:col-span-2 space-y-3">
+                   <label class="text-[10px] font-black uppercase text-slate-400 tracking-widest px-1">Buy Price</label>
+                   <div class="relative">
+                      <span class="absolute left-4 top-1/2 -translate-y-1/2 font-black text-slate-300">$</span>
+                      <input appInput type="number" formControlName="buyPrice" class="h-[54px] pl-10 font-bold"/>
+                   </div>
+                </div>
+                <div class="col-span-4 lg:col-span-2 space-y-3">
+                   <label class="text-[10px] font-black uppercase text-slate-400 tracking-widest px-1">Sell Price</label>
+                   <div class="relative">
+                      <span class="absolute left-4 top-1/2 -translate-y-1/2 font-black text-slate-300">$</span>
+                      <input appInput type="number" formControlName="sellPrice" class="h-[54px] pl-10 font-bold text-indigo-600"/>
+                   </div>
+                </div>
+                <div class="col-span-12 lg:col-span-2 flex justify-end">
+                   <button (click)="removeLine($index)" [disabled]="lines.length === 1" class="w-12 h-12 rounded-xl bg-red-50 text-red-500 hover:bg-red-500 hover:text-white transition-all duration-200 flex items-center justify-center border-2 border-red-50 shadow-sm active:scale-95">
+                      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                   </button>
+                </div>
+              </div>
+              <!-- Hidden Row ID -->
+              <div class="absolute -top-3 left-8 px-4 py-1 bg-white border-2 border-slate-100 rounded-full text-[9px] font-black text-slate-400 uppercase tracking-widest">Row #{{ $index + 1 }}</div>
+            </div>
+          }
+        </div>
+      </div>
+
+      <!-- Footer Stats & Navigation -->
+      <div class="sticky bottom-10 z-20 mx-auto max-w-5xl px-6">
+        <div appCard class="bg-slate-900/95 backdrop-blur-xl border border-white/10 p-10 shadow-[0_50px_100px_rgba(0,0,0,0.2)] flex flex-col md:flex-row items-center justify-between gap-12 text-white">
+          <div class="grid grid-cols-2 lg:grid-cols-3 gap-12 w-full md:w-auto">
+            <div class="space-y-1">
+              <p class="text-[11px] font-bold text-slate-500 uppercase tracking-[0.1em]">Total Cost</p>
+              <p class="text-4xl font-black tracking-tighter">{{ totals.cost | currency }}</p>
+            </div>
+            <div class="space-y-1">
+              <p class="text-[11px] font-bold text-slate-500 uppercase tracking-[0.1em]">Target Revenue</p>
+              <p class="text-4xl font-black text-primary tracking-tighter">{{ totals.revenue | currency }}</p>
+            </div>
+            <div class="hidden lg:block space-y-1">
+              <p class="text-[11px] font-bold text-slate-500 uppercase tracking-[0.1em]">Projected Margin</p>
+              <p class="text-4xl font-black text-emerald-400 tracking-tighter">{{ profitMargin | number:'1.1-1' }}%</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-4 w-full md:w-auto">
+             <button (click)="prevStep()" 
+               class="flex-1 md:flex-none h-16 px-10 bg-white/5 border border-white/10 hover:bg-white/10 text-white rounded-2xl font-black text-xs uppercase tracking-widest transition-all">
+               Back
+             </button>
+             <button (click)="nextStep()" [disabled]="lines.invalid" 
+               appButton
+               variant="default"
+               class="flex-1 md:flex-none h-16 px-12 shadow-primary/30 shadow-2xl">
+               Review Summary
+             </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Step 03: Final Review -->
+  @if (currentStep === 3) {
+    <div class="max-w-4xl mx-auto space-y-12">
+      <div appCard class="p-0 overflow-hidden">
+        <!-- Summary Header -->
+        <div class="p-16 bg-slate-900 text-white min-h-[240px] flex items-center justify-between relative overflow-hidden">
+           <div class="relative z-10 space-y-6">
+              <h2 class="text-6xl font-black tracking-tighter leading-none">Confirm Entry<span class="text-primary text-8xl">.</span></h2>
+              <div class="flex items-center gap-6 text-slate-500 font-bold uppercase text-[10px] tracking-[.3em]">
+                 <span>{{ auth.user?.name }}</span>
+                 <div class="w-2 h-2 bg-primary rounded-full shadow-[0_0_15px_rgba(37,99,235,0.8)]"></div>
+                 <span>Method: {{ headerForm.value.paymentMethod }}</span>
+              </div>
+           </div>
+           <div class="relative z-10 bg-white/5 backdrop-blur-2xl rounded-[2.5rem] p-10 border border-white/10 text-end shadow-2xl">
+              <p class="text-[10px] font-black uppercase tracking-[.2em] text-primary mb-2">Manifest Total Items</p>
+              <p class="text-6xl font-black tracking-tighter">{{ totals.items }}</p>
+           </div>
+           <div class="absolute -right-20 -bottom-20 w-[600px] h-[600px] bg-primary/10 rounded-full blur-[120px]"></div>
+        </div>
+
+        <!-- Details Grid -->
+        <div class="p-12 space-y-10">
+           <div class="grid grid-cols-1 md:grid-cols-3 gap-12">
+              <div class="space-y-2">
+                 <p class="text-[10px] font-black uppercase text-slate-400 tracking-widest">Gross Expenditure</p>
+                 <p class="text-3xl font-black text-slate-900">{{ totals.cost | currency }}</p>
+              </div>
+              <div class="space-y-2">
+                 <p class="text-[10px] font-black uppercase text-slate-400 tracking-widest">Target Revenue</p>
+                 <p class="text-3xl font-black text-indigo-600">{{ totals.revenue | currency }}</p>
+              </div>
+              <div class="space-y-2">
+                 <p class="text-[10px] font-black uppercase text-slate-400 tracking-widest">Estimated Margin</p>
+                 <p class="text-3xl font-black text-green-600">{{ profitMargin | number:'1.1-1' }}%</p>
+              </div>
+           </div>
+
+           <div class="h-px bg-slate-100"></div>
+
+           <div class="space-y-6">
+              <h3 class="text-xs font-black uppercase text-slate-400 tracking-widest px-1">Manifest Breakdown</h3>
+              <div class="space-y-4">
+                @for (l of lines.getRawValue(); track $index) {
+                  <div class="flex items-center justify-between p-4 bg-slate-50/50 rounded-2xl border border-slate-100 hover:bg-slate-50 transition-colors">
+                    <div class="flex items-center gap-4">
+                      <div class="w-10 h-10 rounded-xl bg-slate-900 text-white flex items-center justify-center font-black text-xs">0{{ $index + 1 }}</div>
+                      <div>
+                        <p class="font-black text-slate-900">{{ getProductName(l['product']) }}</p>
+                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Unit Price: {{ l['buyPrice'] | currency }}</p>
+                      </div>
+                    </div>
+                    <p class="text-lg font-black text-slate-900">x{{ l['quantity'] }}</p>
+                  </div>
+                }
+              </div>
+           </div>
+
+           @if (headerForm.value.description) {
+              <div class="p-6 bg-indigo-50 border-2 border-indigo-100 rounded-2xl">
+                 <p class="text-[10px] font-black uppercase text-indigo-400 tracking-widest mb-2">Audit Memo</p>
+                 <p class="text-slate-700 font-bold leading-relaxed italic">"{{ headerForm.value.description }}"</p>
+              </div>
+           }
+        </div>
+
+        <!-- Footer Actions -->
+        <div class="p-10 bg-slate-50/50 flex items-center justify-end gap-6 border-t border-slate-100">
+           <button (click)="prevStep()" class="px-10 h-16 bg-white text-slate-400 border border-slate-200 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:text-slate-900 hover:border-slate-300 transition-all">
+             Reject & Edit
+           </button>
+           <button (click)="submit()" 
+             appButton
+             variant="default"
+             class="px-16 h-16 text-lg shadow-primary/30 shadow-2xl">
+              Confirm & Finalize
+              <svg class="w-6 h-6 ml-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+           </button>
+        </div>
+      </div>
+    </div>
+  }
+</div>

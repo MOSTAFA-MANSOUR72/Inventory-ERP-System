@@ -1,0 +1,144 @@
+<div class="space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-700 pb-20">
+  
+  <header class="relative px-10 lg:px-0">
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-8">
+      <div class="space-y-3">
+        <div class="flex items-center gap-3">
+          <span class="px-3 py-1 bg-primary text-[10px] font-black text-white uppercase tracking-[0.2em] rounded-lg">{{ 'TOPBAR.SYSTEM_LIVE' | translate }}</span>
+          <span class="h-px w-12 bg-slate-200"></span>
+        </div>
+        <h1 class="text-6xl font-black tracking-tight text-slate-900">
+          {{ 'SIDEBAR.DASHBOARD' | translate }}<span class="text-primary">.</span>
+        </h1>
+        @if (auth.user$ | async; as user) {
+          <p class="text-sm font-bold text-slate-400 uppercase tracking-widest">
+            {{ 'TOPBAR.OPERATOR' | translate }}: <span class="text-slate-900 underline decoration-primary decoration-2 underline-offset-8">{{ user.name }}</span>
+          </p>
+        }
+      </div>
+
+      <div class="hidden lg:flex items-center gap-6 bg-white border-2 border-slate-100 p-5 rounded-[2rem] shadow-[0_8px_30px_rgba(0,0,0,0.02)]">
+        <div class="text-end">
+          <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">{{ 'TOPBAR.CURRENT_SESSION' | translate }}</p>
+          <p class="text-sm font-black text-slate-900">{{ 'TOPBAR.ACTIVE_SYNC' | translate }}</p>
+        </div>
+        <div class="h-12 w-12 bg-primary/10 rounded-2xl flex items-center justify-center text-primary">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+        </div>
+      </div>
+    </div>
+  </header>
+  
+  <!-- Critical Operations Pulse -->
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-10 px-10 lg:px-0">
+    <app-stat-card 
+      [title]="'DASHBOARD.SALES_LEDGER' | translate" 
+      [value]="(stats.todaySales | currency:'EGP ':'symbol':'1.0-2') ?? 'EGP 0'" 
+      [progress]="dailyTargetProgress"
+      [trend]="{ value: (dailyTargetProgress | number:'1.0-0') + '%', isPositive: true }"
+      [loading]="loading"
+    >
+      <svg icon class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+    </app-stat-card>
+
+    <app-stat-card 
+      [title]="'DASHBOARD.OPEN_ORDERS' | translate" 
+      [value]="stats.openOrders ?? 0" 
+      [alert]="(stats.openOrders ?? 0) > 0"
+      [pulse]="(stats.openOrders ?? 0) > 0"
+      [loading]="loading"
+    >
+      <svg icon class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m0 0l8 4m-8-4v10l8 4v-10m0-12l8 4v10m0 0l-8 4m8-4v-10"></path></svg>
+    </app-stat-card>
+  </div>
+
+  @if (auth.user$ | async; as user) {
+    
+    @if (user.role === 'cashier') {
+      <div class="space-y-8">
+        <div class="bg-slate-900 rounded-[3rem] p-12 text-white relative overflow-hidden group shadow-2xl">
+          <div class="relative z-10 space-y-8">
+            <h2 class="text-5xl font-black leading-tight">{{ 'DASHBOARD.READY_SALE_TITLE' | translate }}</h2>
+            <p class="text-slate-400 max-w-md font-bold text-lg leading-relaxed">{{ 'DASHBOARD.READY_SALE_DESC' | translate }}</p>
+            <div class="flex flex-wrap gap-6 pt-4">
+              <a routerLink="/sales/new" class="px-10 py-5 bg-primary hover:bg-primary/90 text-white rounded-[1.25rem] font-black text-xl transition-all active:scale-95 flex items-center gap-3 shadow-[0_20px_40px_rgba(37,99,235,0.3)]">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                {{ 'DASHBOARD.NEW_TRANSACTION' | translate }}
+              </a>
+              <a routerLink="/sales" class="px-10 py-5 bg-white/5 hover:bg-white/10 text-white border border-white/10 rounded-[1.25rem] font-black text-xl transition-all">
+                {{ 'DASHBOARD.VIEW_HISTORY' | translate }}
+              </a>
+            </div>
+          </div>
+          <div class="absolute -right-20 -bottom-20 w-80 h-80 bg-indigo-500/10 rounded-full blur-3xl"></div>
+          <div class="absolute right-10 top-10 text-white/5 select-none">
+            <svg class="w-64 h-64" fill="currentColor" viewBox="0 0 24 24"><path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+          </div>
+        </div>
+      </div>
+    }
+
+    @if (user.role === 'manager' || user.role === 'admin') {
+      <div class="space-y-12">
+        
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-6 tracking-tight">
+          <div class="bg-white p-8 rounded-[16px] border border-[#E2E8F0] shadow-[0_1px_4px_rgba(0,0,0,0.06)] relative overflow-hidden transition-all hover:shadow-md" [class.shimmer]="loading">
+            <p class="text-[11px] font-bold text-slate-500 uppercase tracking-[0.1em] mb-2">{{ 'SIDEBAR.PRODUCTS' | translate }}</p>
+            <p class="text-4xl font-extrabold text-slate-800" [class.opacity-0]="loading">{{ stats.totalProducts }}</p>
+          </div>
+          <div class="bg-white p-8 rounded-[16px] border border-[#E2E8F0] shadow-[0_1px_4px_rgba(0,0,0,0.06)] relative overflow-hidden transition-all hover:shadow-md" [class.shimmer]="loading">
+            <p class="text-[11px] font-bold text-slate-500 uppercase tracking-[0.1em] mb-2">{{ 'DASHBOARD.LOW_STOCK' | translate }}</p>
+            <p class="text-4xl font-black" [class.opacity-0]="loading" [class.text-rose-600]="(stats.lowStockCount ?? 0) > 0" [class.text-slate-900]="(stats.lowStockCount ?? 0) === 0">{{ stats.lowStockCount }}</p>
+          </div>
+          <div class="bg-white p-8 rounded-[16px] border border-[#E2E8F0] shadow-[0_1px_4px_rgba(0,0,0,0.06)] relative overflow-hidden transition-all hover:shadow-md" [class.shimmer]="loading">
+            <p class="text-[11px] font-bold text-slate-500 uppercase tracking-[0.1em] mb-2">{{ 'SIDEBAR.CONTRACTS' | translate }}</p>
+            <p class="text-4xl font-extrabold text-slate-800" [class.opacity-0]="loading">{{ stats.totalContracts }}</p>
+            @if ((stats.pendingContracts ?? 0) > 0 && !loading) {
+               <span class="absolute top-6 right-6 h-3 w-3 bg-primary rounded-full animate-ping"></span>
+            }
+          </div>
+          <div class="bg-white p-8 rounded-[16px] border border-[#E2E8F0] shadow-[0_1px_4px_rgba(0,0,0,0.06)] relative overflow-hidden transition-all hover:shadow-md" [class.shimmer]="loading">
+            <p class="text-[11px] font-bold text-slate-500 uppercase tracking-[0.1em] mb-2">{{ 'SIDEBAR.SUPPLIERS' | translate }}</p>
+            <p class="text-4xl font-black text-primary" [class.opacity-0]="loading">{{ stats.totalSuppliers }}</p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          
+          <div class="relative group bg-white border border-[#E2E8F0] rounded-[16px] p-12 transition-all hover:-translate-y-2 shadow-[0_1px_4px_rgba(0,0,0,0.06)]">
+            <div class="flex justify-between items-start mb-12">
+              <div class="w-20 h-20 bg-slate-900 text-white rounded-3xl flex items-center justify-center shadow-2xl">
+                <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m0 0l8 4m-8-4v10l8 4v-10m0-12l8 4v10m0 0l-8 4m8-4v-10"></path></svg>
+              </div>
+              <span class="px-5 py-2 rounded-full border-2 border-slate-100 text-[10px] font-black uppercase tracking-widest">Module 01</span>
+            </div>
+            <h3 class="text-4xl font-extrabold text-slate-900 mb-6 tracking-tight">{{ 'DASHBOARD.ENGINE_TITLE' | translate }}</h3>
+            <p class="text-slate-500 font-bold text-xl leading-relaxed mb-10">{{ 'DASHBOARD.ENGINE_DESC' | translate }}</p>
+            <div class="flex gap-6">
+              <a routerLink="/products" class="px-8 py-4 bg-slate-900 text-white rounded-2xl font-black text-base hover:bg-primary transition-all active:scale-95 shadow-xl">{{ 'DASHBOARD.MANAGE_PRODUCTS' | translate }}</a>
+              <a routerLink="/categories" class="px-8 py-4 bg-white text-slate-900 border-2 border-slate-100 rounded-2xl font-black text-base hover:bg-slate-50 transition-all active:scale-95 shadow-sm">{{ 'SIDEBAR.CATEGORIES' | translate }}</a>
+            </div>
+          </div>
+
+          @if (user.role === 'admin') {
+            <div class="relative group bg-white border border-[#E2E8F0] rounded-[16px] p-12 transition-all hover:-translate-y-2 shadow-[0_1px_4px_rgba(0,0,0,0.06)]">
+              <div class="flex justify-between items-start mb-12">
+                <div class="w-20 h-20 bg-rose-600 text-white rounded-3xl flex items-center justify-center shadow-2xl">
+                  <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A10.003 10.003 0 0012 3m0 18a10.003 10.003 0 01-9.712-13.86l.053-.105m11.978 13.86a10.001 10.001 0 009.474-9.474m-9.474 9.474a10.001 10.001 0 01-9.474-9.474m9.474 0V11m0 0a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                </div>
+                <span class="px-5 py-2 rounded-full border-2 border-slate-100 text-[10px] font-black uppercase tracking-widest">Module 02</span>
+              </div>
+              <h3 class="text-4xl font-extrabold text-slate-900 mb-6 tracking-tight">{{ 'DASHBOARD.CORE_TITLE' | translate }}</h3>
+              <p class="text-slate-500 font-bold text-xl leading-relaxed mb-10">{{ 'DASHBOARD.CORE_DESC' | translate }}</p>
+              <div class="flex gap-6">
+                <a routerLink="/users" class="px-8 py-4 bg-slate-900 text-white rounded-2xl font-black text-base hover:bg-rose-600 transition-all active:scale-95 shadow-xl">{{ 'DASHBOARD.STAFF_ACCESS' | translate }}</a>
+                <a routerLink="/branches" class="px-8 py-4 bg-white text-slate-900 border-2 border-slate-100 rounded-2xl font-black text-base hover:bg-slate-50 transition-all active:scale-95 shadow-sm">{{ 'SIDEBAR.BRANCHES' | translate }}</a>
+              </div>
+            </div>
+          }
+
+        </div>
+      </div>
+    }
+  }
+</div>

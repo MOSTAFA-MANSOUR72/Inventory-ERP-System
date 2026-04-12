@@ -1,0 +1,170 @@
+<div class="page-content space-y-12">
+  <!-- Header -->
+  <div class="flex flex-col md:flex-row md:items-center justify-between gap-8">
+    <div class="space-y-3">
+      <h1 class="page-title">{{ 'SIDEBAR.INVENTORY' | translate }}</h1>
+      <p class="page-subtitle">{{ 'TOPBAR.ACTIVE_SYNC' | translate }} - {{ 'DASHBOARD.READY_SALE_DESC' | translate }}</p>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div appCard class="p-10">
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+      <div class="md:col-span-2 space-y-3">
+        <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">{{ 'TOPBAR.SEARCH' | translate }}</label>
+        <div class="relative group">
+          <input
+            type="text"
+            appInput
+            [formControl]="searchCtrl"
+            [placeholder]="'TOPBAR.SEARCH' | translate"
+            class="pl-12"
+          />
+          <svg class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-primary transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+          </svg>
+        </div>
+      </div>
+      
+      <div class="space-y-3">
+        <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">{{ 'SIDEBAR.CATEGORIES' | translate }}</label>
+        <select appInput [formControl]="categoryCtrl">
+          <option [value]="null">All Categories</option>
+          @if (categories$ | async; as catRes) {
+            @for (c of catRes.data.categories; track c._id) {
+              <option [value]="c._id">{{ c.name }}</option>
+            }
+          }
+        </select>
+      </div>
+
+      <div class="flex items-end">
+        <button 
+            (click)="load()">
+          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+          </svg>
+          Refresh
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Error State -->
+  @if (error && !loading) {
+    <div class="p-5 bg-red-50 border-2 border-red-100 rounded-2xl flex items-start gap-4">
+      <div class="w-10 h-10 rounded-xl bg-red-600 flex items-center justify-center text-white shadow-lg shadow-red-100">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+      </div>
+      <div>
+        <h4 class="font-black text-red-900 leading-tight">Syncing Error</h4>
+        <p class="text-red-700 text-sm font-bold mt-1">{{ error }}</p>
+        <button 
+            (click)="load()">Try again</button>
+      </div>
+    </div>
+  }
+
+  <!-- Loading State -->
+  @if (loading) {
+    <div appCard class="p-16 text-center border-dashed border-2">
+      <div class="w-12 h-12 rounded-2xl border-4 border-slate-100 border-t-indigo-600 animate-spin mx-auto ring-8 ring-indigo-50/50"></div>
+      <p class="text-slate-400 font-black uppercase tracking-widest text-[10px] mt-6 animate-pulse">Synchronizing Ledger...</p>
+    </div>
+  }
+
+  <!-- Empty State -->
+  @if (!loading && data.length === 0) {
+    <div appCard class="p-20 text-center border-dashed border-2">
+      <div class="w-20 h-20 mx-auto rounded-3xl bg-slate-50 flex items-center justify-center text-slate-300 mb-6 ring-4 ring-slate-100/50">
+        <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m0 0l8 4m-8-4v10l8 4v-10m0-12l8 4v10m0 0l-8 4m8-4v-10"></path></svg>
+      </div>
+      <h3 class="text-xl font-black text-slate-900 mb-2">No Inventory Mapped</h3>
+      <p class="text-slate-500 font-bold max-w-sm mx-auto mb-8">This branch doesn't have any products assigned yet or your filters returned no results.</p>
+      <button 
+            (click)="searchCtrl.setValue(''); categoryCtrl.setValue(null)">Clear Filters</button>
+    </div>
+  }
+
+  <!-- Table View -->
+  @if (!loading && data.length > 0) {
+    <div appCard class="overflow-hidden border-none shadow-[0_30px_60px_rgba(0,0,0,0.03)]">
+      <div class="overflow-x-auto">
+        <table class="modern-table">
+          <thead>
+            <tr>
+              <th class="w-24">Item</th>
+              <th>{{ 'SIDEBAR.PRODUCTS' | translate }}</th>
+              @if (auth.user?.role === 'admin' || auth.user?.role === 'manager') {
+                <th>{{ 'SIDEBAR.BRANCHES' | translate }}</th>
+              }
+              <th>{{ 'DASHBOARD.LOW_STOCK' | translate }}</th>
+              <th>{{ 'DASHBOARD.SALES_LEDGER' | translate }}</th>
+              <th class="text-end">ID</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of data; track row._id) {
+              <tr class="hover:bg-primary/5 transition-all duration-200">
+                <td>
+                  @if (row.product.image) {
+                    <img [src]="assetUrl(row.product.image)" class="w-16 h-16 rounded-[1.25rem] object-cover shadow-sm ring-4 ring-white" />
+                  } @else {
+                    <div class="w-16 h-16 rounded-[1.25rem] bg-primary text-white flex items-center justify-center font-black text-xl shadow-lg shadow-primary/20 ring-4 ring-white">
+                      {{ getProductName(row).substring(0, 1) }}
+                    </div>
+                  }
+                </td>
+                <td>
+                  <span class="block text-base font-black text-slate-900 mb-1">{{ getProductName(row) }}</span>
+                  <span class="inline-block text-[10px] font-black uppercase tracking-widest text-primary bg-primary/10 px-3 py-1 rounded-lg">{{ getCategoryName(row) }}</span>
+                </td>
+                @if (auth.user?.role === 'admin' || auth.user?.role === 'manager') {
+                  <td>
+                    <span class="text-sm font-bold text-slate-600">{{ getBranchName(row) }}</span>
+                  </td>
+                }
+                <td>
+                  <div class="flex flex-col gap-2">
+                    <span class="text-xl font-black text-slate-900 tracking-tight leading-none">{{ row.quantity }} <span class="text-[10px] uppercase text-slate-400 tracking-widest ml-1">Units</span></span>
+                    <span class="inline-flex px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest w-fit border shadow-sm" [class]="getStockStatus(row.quantity)">
+                      {{ getStockLabel(row.quantity) }}
+                    </span>
+                  </div>
+                </td>
+                <td>
+                   <div class="flex flex-col border-l-4 border-primary pl-5 py-1">
+                    <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">{{ 'DASHBOARD.NEW_TRANSACTION' | translate }}</span>
+                    <span class="text-2xl font-black text-slate-900 tracking-tight">{{ row.sellPrice | currency }}</span>
+                   </div>
+                </td>
+                <td class="text-end">
+                  <span class="text-[10px] font-mono font-bold text-slate-300 tracking-wider">#{{ row._id.substring(row._id.length - 8).toUpperCase() }}</span>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination -->
+      <div class="modern-pagination">
+        <p class="pagination-info">
+          Showing <span class="text-slate-900">{{ Math.min(pageIndex * pageSize + 1, total) }}</span> - <span class="text-slate-900">{{ Math.min((pageIndex + 1) * pageSize, total) }}</span> of <span class="text-primary">{{ total }}</span> Stock Items
+        </p>
+        <div class="pagination-actions">
+          <button 
+            (click)="onPage({ pageIndex: pageIndex - 1, pageSize })"
+            [disabled]="pageIndex === 0">
+            {{ 'COMMON.PREVIOUS' | translate }}
+          </button>
+          <button 
+            (click)="onPage({ pageIndex: pageIndex + 1, pageSize })"
+            [disabled]="pageIndex + 1 >= totalPages">
+            {{ 'COMMON.NEXT' | translate }}
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+</div>

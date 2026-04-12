@@ -1,0 +1,56 @@
+// Remove default Material card backgrounds to use our custom container
+::ng-deep .printflow-stepper {
+  background: transparent !important;
+
+  .mat-step-header {
+    padding: 24px !important;
+    
+    .mat-step-label {
+      font-weight: 900 !important;
+      text-transform: uppercase;
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      color: #94a3b8; // slate-400
+
+      &.mat-step-label-active {
+        color: #0f172a; // slate-900
+      }
+    }
+
+    .mat-step-icon {
+      background-color: #f1f5f9;
+      color: #64748b;
+      font-weight: 900;
+      
+      &-selected {
+        background-color: #4f46e5; // indigo-600
+        color: white;
+      }
+    }
+  }
+
+  // Remove the gray background from Material inputs
+  .mat-mdc-form-field-focus-overlay {
+    background-color: transparent !important;
+  }
+
+  .mat-mdc-text-field-wrapper {
+    background-color: #ffffff !important;
+    border-radius: 12px !important;
+  }
+}
+
+// Global class for inputs without bottom padding/subscript
+::ng-deep .no-subscript {
+  .mat-mdc-form-field-subscript-wrapper {
+    display: none !important;
+  }
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #e2e8f0;
+  border-radius: 10px;
+}

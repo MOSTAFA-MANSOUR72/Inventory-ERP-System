@@ -1,0 +1,77 @@
+<div class="min-h-screen flex items-center justify-center p-6 bg-background animate-in fade-in duration-1000">
+  <div appCard class="w-full max-w-[480px] p-12 shadow-[0_40px_80px_rgba(0,0,0,0.06)] border-none">
+
+    <div class="flex flex-col items-center mb-12 text-center">
+      <div class="w-16 h-16 bg-primary/10 text-primary rounded-[1.5rem] flex items-center justify-center mb-6 shadow-sm ring-8 ring-primary/5">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+        </svg>
+      </div>
+      <h1 class="text-4xl font-extrabold text-slate-800 tracking-tight mb-2">{{ 'AUTH.APP_NAME' | translate }}</h1>
+      <p class="text-sm font-bold text-slate-400 uppercase tracking-widest leading-none">{{ 'AUTH.APP_TAGLINE' | translate }}</p>
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="submit()" class="space-y-8">
+      <div class="space-y-2">
+        <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">{{ 'AUTH.EMAIL' | translate }}</label>
+        <input
+          appInput
+          type="email"
+          formControlName="email"
+          [placeholder]="'AUTH.EMAIL_PLACEHOLDER' | translate"
+        />
+        <p *ngIf="form.controls.email.errors?.['required'] && form.controls.email.touched" class="text-rose-600 text-[10px] font-black uppercase tracking-widest mt-2 flex items-center gap-1.5 animate-in slide-in-from-left-2">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+          {{ 'AUTH.EMAIL_REQUIRED' | translate }}
+        </p>
+      </div>
+
+      <div class="space-y-2">
+        <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">{{ 'AUTH.PASSWORD' | translate }}</label>
+        <div class="relative group">
+          <input
+            appInput
+            [type]="hidePassword ? 'password' : 'text'"
+            formControlName="password"
+            placeholder="••••••••"
+          />
+          <button
+            type="button"
+            (click)="hidePassword = !hidePassword"
+            class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-300 hover:text-primary transition-colors">
+            <svg *ngIf="hidePassword" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+            <svg *ngIf="!hidePassword" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.542-7a10.024 10.024 0 014.132-5.413M9.9 4.24a9.123 9.123 0 011.1-.12c4.478 0 8.268 2.943 9.542 7a10.025 10.025 0 01-4.132 5.413M15 15l3 3m-3-3l-3 3m3-3l-3-3m3 3l3-3M3 3l18 18" /></svg>
+          </button>
+        </div>
+        <p *ngIf="form.controls.password.errors?.['required'] && form.controls.password.touched" class="text-rose-600 text-[10px] font-black uppercase tracking-widest mt-2 flex items-center gap-1.5 animate-in slide-in-from-left-2">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+          {{ 'AUTH.PASSWORD_REQUIRED' | translate }}
+        </p>
+        <p *ngIf="form.controls.password.errors?.['minlength'] && form.controls.password.touched" class="text-rose-600 text-[10px] font-black uppercase tracking-widest mt-2 flex items-center gap-1.5 animate-in slide-in-from-left-2">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+          {{ 'AUTH.PASSWORD_MIN_LENGTH' | translate }}
+        </p>
+      </div>
+
+      <div class="flex items-center">
+        <input type="checkbox" id="remember" class="w-5 h-5 text-primary border-slate-200 rounded-lg focus:ring-primary transition-all cursor-pointer">
+        <label for="remember" class="ml-3 text-sm text-slate-500 font-bold cursor-pointer">{{ 'AUTH.REMEMBER_ME' | translate }}</label>
+      </div>
+
+      <button
+        appButton
+        variant="default"
+        type="submit"
+        [disabled]="submitting || form.invalid"
+        class="w-full h-16 text-lg shadow-primary/20 shadow-xl"
+        [loading]="submitting">
+        @if (submitting) { {{ 'AUTH.SIGNING_IN' | translate }} } @else { {{ 'AUTH.SIGN_IN' | translate }} }
+      </button>
+    </form>
+
+    <div class="mt-10 pt-10 border-t border-slate-50 flex flex-col gap-4 text-center">
+      <a routerLink="/auth/forgot-password" class="text-sm font-black text-primary hover:text-primary/80 transition-colors">{{ 'AUTH.FORGOT_PASSWORD' | translate }}</a>
+      <p class="text-sm font-bold text-slate-400">{{ 'AUTH.NO_ACCOUNT' | translate }} <a routerLink="/auth/register" class="text-primary hover:underline ml-1 font-black">{{ 'AUTH.SIGN_UP' | translate }}</a></p>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,175 @@
+<div class="page-content space-y-10">
+  <!-- Header -->
+  <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
+    <div class="space-y-2">
+      <h1 class="page-title">{{ 'SIDEBAR.PRODUCTS' | translate }}</h1>
+      <p class="page-subtitle">{{ 'DASHBOARD.ENGINE_DESC' | translate }}</p>
+    </div>
+    @if (auth.user$ | async; as user) {
+      @if (canManage(user.role)) {
+        <a routerLink="/products/new" appButton variant="add" size="sm">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+          </svg>
+          Add Product
+        </a>
+      }
+    }
+</div>
+
+  <!-- Filters -->
+  <div appCard class="p-10">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <div class="space-y-3">
+        <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">{{ 'TOPBAR.SEARCH' | translate }}</label>
+        <input
+          type="text"
+          appInput
+          [formControl]="searchCtrl"
+          placeholder="Product name or description..."
+        />
+      </div>
+      <div class="space-y-3">
+        <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">{{ 'SIDEBAR.CATEGORIES' | translate }}</label>
+        <select appInput [formControl]="categoryCtrl">
+          <option value="">All Categories</option>
+          @if (categories$ | async; as catRes) {
+            @for (c of catRes.data.categories; track c._id) {
+              <option [value]="c._id">{{ c.name }}</option>
+            }
+          }
+        </select>
+      </div>
+      <div class="flex items-end">
+        <button 
+            (click)="load()">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+          </svg>
+          Refresh
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Error State -->
+  @if (error && !loading) {
+    <div class="p-4 bg-destructive/10 text-destructive rounded-lg flex items-start gap-3">
+      <svg class="w-5 h-5 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"></path>
+      </svg>
+      <div>
+        <p class="font-medium">{{ error }}</p>
+        <button 
+            (click)="load()">Try again</button>
+      </div>
+    </div>
+  }
+
+  <!-- Loading State -->
+  @if (loading) {
+    <div appCard class="p-8 text-center">
+      <div class="inline-flex items-center justify-center">
+        <div class="w-8 h-8 rounded-full border-4 border-muted border-t-primary animate-spin"></div>
+      </div>
+      <p class="text-muted-foreground mt-2">Loading products...</p>
+    </div>
+  }
+
+  <!-- Empty State -->
+  @if (!loading && data.length === 0) {
+    <div appCard class="p-12 text-center">
+      <svg class="w-16 h-16 mx-auto text-muted-foreground/50 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m0 0l8 4m-8-4v10l8 4v-10m0-12l8 4v10m0 0l-8 4m8-4v-10"></path>
+      </svg>
+      <h3 class="text-lg font-semibold mb-1">No products found</h3>
+      <p class="text-muted-foreground mb-6">Try adjusting your filters or create a new product</p>
+      @if (auth.user$ | async; as user) {
+        @if (canManage(user.role)) {
+          <a routerLink="/products/new" appButton variant="add" size="sm">Add Product</a>
+        }
+      }
+    </div>
+  }
+
+  <!-- Table View -->
+  @if (!loading && data.length > 0) {
+    <div appCard class="overflow-hidden border-none shadow-[0_30px_60px_rgba(0,0,0,0.03)]">
+      <div class="overflow-x-auto">
+        <table class="modern-table">
+          <thead>
+            <tr>
+              <th class="w-20"></th>
+              <th>{{ 'SIDEBAR.PRODUCTS' | translate }}</th>
+              <th>{{ 'SIDEBAR.CATEGORIES' | translate }}</th>
+              <th>{{ 'DASHBOARD.SALES_LEDGER' | translate }}</th>
+              <th class="text-end">{{ 'COMMON.ACTIONS' | translate }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of data; track row._id) {
+              <tr class="hover:bg-muted/50 transition-colors">
+                <td class="px-6 py-4">
+                  @if (row.image) {
+                    <img [src]="assetUrl(row.image)" width="40" height="40" alt="" class="w-10 h-10 rounded object-cover" />
+                  } @else {
+                    <div class="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-xs font-semibold text-primary">
+                      {{ row.name.substring(0, 1) }}
+                    </div>
+                  }
+                </td>
+                <td class="px-6 py-4">
+                  <a [routerLink]="['/products', row._id]" class="font-semibold text-foreground hover:text-primary transition">{{ row.name }}</a>
+                  @if (row.description) {
+                    <p class="text-sm text-muted-foreground mt-1">{{ row.description | slice: 0: 80 }}@if (row.description.length > 80) { … }</p>
+                  }
+                </td>
+                <td class="px-6 py-4 text-sm text-muted-foreground">{{ categoryName(row) }}</td>
+                <td class="px-6 py-4 font-semibold">${{ row.price | number: '1.2-2' }}</td>
+                <td class="px-6 py-4 text-end">
+                  <a [routerLink]="['/products', row._id]" appButton variant="ghost" size="sm">View</a>
+                  @if (auth.user$ | async; as user) {
+                    @if (canManage(user.role)) {
+                      <a [routerLink]="['/products', row._id, 'edit']" appButton variant="ghost" size="sm">Edit</a>
+                    }
+                  }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination -->
+      <div class="modern-pagination">
+        <p class="pagination-info">
+          Showing {{ Math.min(pageIndex * pageSize + 1, total) }} to {{ Math.min((pageIndex + 1) * pageSize, total) }} of {{ total }} products
+        </p>
+        <div class="flex gap-2">
+          <button
+            appButton
+            variant="outline"
+            size="sm"
+            (click)="onPage({ pageIndex: pageIndex - 1, pageSize })"
+            [disabled]="pageIndex === 0">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+            </svg>
+            Previous
+          </button>
+          <button
+            appButton
+            variant="outline"
+            size="sm"
+            (click)="onPage({ pageIndex: pageIndex + 1, pageSize })"
+            [disabled]="pageIndex + 1 >= totalPages">
+            Next
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+</div>
