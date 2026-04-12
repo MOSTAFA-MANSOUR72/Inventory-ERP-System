@@ -67,7 +67,7 @@ exports.getAllProducts = catchAsync(async (req, res, next) => {
   }
 
   // Filter by category if provided
-  if (category) {
+  if (category && category !== 'null' && category !== 'undefined') {
     query.category = category;
   }
 
