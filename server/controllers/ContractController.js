@@ -80,15 +80,20 @@ exports.createContract = catchAsync(async (req, res, next) => {
 exports.getContracts = catchAsync(async (req, res, next) => {
   const { page = 1, limit = 10, status, branch } = req.query;
   const skip = (page - 1) * limit;
-  const managerId = req.user._id;
+  let query = {};
 
-  let query = { manager: managerId };
+  if (req.user.role === 'cashier') {
+    query.branch = req.user.branch;
+  } else if (req.user.role === 'manager') {
+    query.manager = req.user._id;
+  }
+  // Admin sees everything if no filters applied
 
   if (status) {
     query.status = status;
   }
 
-  if (branch) {
+  if (branch && req.user.role !== 'cashier') {
     query.branch = branch;
   }
 
@@ -127,8 +132,12 @@ exports.getContractById = catchAsync(async (req, res, next) => {
     return next(new AppError("No contract found with that ID", 404));
   }
 
-  // Verify ownership
-  if (contract.manager.toString() !== req.user._id.toString() && req.user.role !== "admin") {
+  // Verify access permissions
+  const isOwner = contract.manager.toString() === req.user._id.toString();
+  const isAdmin = req.user.role === "admin";
+  const isBranchCashier = req.user.role === "cashier" && contract.branch._id.toString() === req.user.branch.toString();
+
+  if (!isOwner && !isAdmin && !isBranchCashier) {
     return next(new AppError("You do not have permission to view this contract", 403));
   }
 
