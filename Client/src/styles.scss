@@ -336,3 +336,71 @@
     transform: scale(0.97) !important;
   }
 }
+
+/* ── Global Input Fields Highlight ─────────────────────── */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"],
+input[type="search"],
+input[type="tel"],
+input[type="url"],
+input[type="date"],
+input[type="time"],
+input[type="datetime-local"],
+textarea,
+.form-control,
+.form-select {
+  background: #EBF2FA !important;
+  border: 1.5px solid #BFDBF7 !important;
+  border-left: 4px solid #185FA5 !important;
+  color: #1E3A5F !important;
+  border-radius: 10px !important;
+  font-weight: 600 !important;
+  transition: border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease !important;
+}
+
+input[type="text"]:hover,
+input[type="email"]:hover,
+input[type="password"]:hover,
+input[type="number"]:hover,
+input[type="search"]:hover,
+input[type="tel"]:hover,
+input[type="url"]:hover,
+input[type="date"]:hover,
+input[type="time"]:hover,
+input[type="datetime-local"]:hover,
+textarea:hover,
+.form-control:hover,
+.form-select:hover {
+  background: #DBEAFE !important;
+  border-color: #93C5FD !important;
+}
+
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus,
+input[type="number"]:focus,
+input[type="search"]:focus,
+input[type="tel"]:focus,
+input[type="url"]:focus,
+input[type="date"]:focus,
+input[type="time"]:focus,
+input[type="datetime-local"]:focus,
+textarea:focus,
+.form-control:focus,
+.form-select:focus {
+  background: #DBEAFE !important;
+  border-color: #185FA5 !important;
+  border-left-color: #185FA5 !important;
+  box-shadow: 0 0 0 3px rgba(24, 95, 165, 0.12) !important;
+  outline: none !important;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: #64A4D8 !important;
+  opacity: 1 !important;
+}
+
+@import "./app/features/reports/print.scss";

@@ -15,6 +15,8 @@ const contractRoutes = require('./routes/ContractRoutes');
 const sellRoutes = require('./routes/sellRoutes');
 const inventoryRoutes = require('./routes/inventoryRoutes');
 const dashboardRoutes = require('./routes/dashboardRoutes');
+const reportsRoutes = require('./routes/reportsRoutes');
+
 
 const app = Express();
 
@@ -57,6 +59,8 @@ app.use("/api/contracts", contractRoutes);
 app.use("/api/sales", sellRoutes);
 app.use("/api/inventory", inventoryRoutes);
 app.use("/api/dashboard", dashboardRoutes);
+app.use("/api/reports", reportsRoutes);
+
 
 app.get("/", (req, res) => {
   res.send("Hello World");

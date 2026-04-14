@@ -67,6 +67,7 @@ export class MainLayoutComponent {
   readonly roles = {
     adminOnly: ['admin'] as UserRole[],
     adminManager: ['admin', 'manager'] as UserRole[],
+    managerOnly: ['manager'] as UserRole[],
     cashierOnly: ['cashier'] as UserRole[],
     notCashier: ['admin', 'manager'] as UserRole[],
     all: ['admin', 'manager', 'cashier'] as UserRole[],

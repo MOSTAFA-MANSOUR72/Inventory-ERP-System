@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './core/guards/auth.guard';
 import { guestGuard } from './core/guards/guest.guard';
+import { roleGuard } from './core/guards/role.guard';
 
 import { AUTH_ROUTES } from './features/auth/auth.routes';
 import { MainLayoutComponent } from './layout/main-layout.component';
@@ -14,6 +15,8 @@ import { PROVIDERS_ROUTES } from './features/providers/providers.routes';
 import { CONTRACTS_ROUTES } from './features/contracts/contracts.routes';
 import { SALES_ROUTES } from './features/sales/sales.routes';
 import { PROFILE_ROUTES } from './features/profile/profile.routes';
+import { REPORTS_ROUTES } from './features/reports/reports.routes';
+
 import { UnauthorizedComponent } from './features/errors/unauthorized.component';
 import { ForbiddenComponent } from './features/errors/forbidden.component';
 import { NotFoundComponent } from './features/errors/not-found.component';
@@ -70,6 +73,12 @@ export const routes: Routes = [
         path: 'profile',
         children: PROFILE_ROUTES,
       },
+      {
+        path: 'reports',
+        canActivate: [roleGuard(['manager'])],
+        children: REPORTS_ROUTES,
+      },
+
     ],
   },
   {

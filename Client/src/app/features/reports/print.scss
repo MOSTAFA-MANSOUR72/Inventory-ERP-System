@@ -1,0 +1,56 @@
+@media print {
+  body {
+    background: white !important;
+    color: black !important;
+  }
+
+  .sidebar, .topbar, .no-print, .breadcrumb-container, .menu-toggle, .btn-lang, .user-avatar, .sidebar-footer {
+    display: none !important;
+  }
+
+  .main-content {
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+  }
+
+  .content {
+    overflow: visible !important;
+    background: white !important;
+  }
+
+  .content-inner {
+    padding: 20px !important;
+    margin: 0 !important;
+    width: 100% !important;
+    max-width: none !important;
+  }
+
+  app-card {
+    box-shadow: none !important;
+    border: 1px solid #eee !important;
+  }
+
+  .card {
+     box-shadow: none !important;
+     border: 1px solid #eee !important;
+  }
+
+  .table-responsive {
+    overflow: visible !important;
+  }
+
+  table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+  }
+
+  th, td {
+    border: 1px solid #eee !important;
+    padding: 8px !important;
+  }
+
+  .page-break {
+    page-break-before: always;
+  }
+}
