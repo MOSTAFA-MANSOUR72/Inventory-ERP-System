@@ -24,34 +24,126 @@ textarea {
   resize: none;
 }
 
-select:focus, input:focus {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.1);
+// Enhanced Select & Input Styling
+select, input, textarea {
+  transition: all 0.2s ease;
+
+  &:focus {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 20px -8px rgba(79, 70, 229, 0.15);
+  }
+
+  &::placeholder {
+    font-weight: 600;
+    opacity: 0.5;
+  }
 }
 
-// Custom Stepper Transition
-@keyframes fadeInScale {
+// Custom select chevron animation
+select {
+  background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2220%22%20height%3D%2220%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%236366f1%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E") !important;
+  background-repeat: no-repeat !important;
+  background-position: right 1rem center !important;
+  background-size: 1.25em !important;
+  padding-right: 2.75rem !important;
+  appearance: none;
+  cursor: pointer;
+
+  option {
+    padding: 12px 16px;
+    font-weight: 600;
+  }
+}
+
+// Stepper step circles
+.step-circle {
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+// Group hover effects for line items
+.group {
+  .line-row-badge {
+    transition: all 0.3s ease;
+  }
+
+  &:hover {
+    .line-row-badge {
+      border-color: rgba(79, 70, 229, 0.3);
+      color: rgb(79, 70, 229);
+    }
+  }
+}
+
+// Disabled button state refinement
+button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  filter: grayscale(0.5);
+  transform: none !important;
+}
+
+// Sticky footer gradient edge
+.sticky {
+  &::before {
+    content: '';
+    position: absolute;
+    inset: -20px -20px 0;
+    background: linear-gradient(to top, rgba(15, 23, 42, 0.08), transparent);
+    pointer-events: none;
+    z-index: -1;
+  }
+}
+
+// Card hover micro-interactions
+[appCard] {
+  &:hover {
+    select, input, textarea {
+      border-color: rgba(79, 70, 229, 0.2);
+    }
+  }
+}
+
+// Step content transitions
+@keyframes fadeInUp {
   from {
     opacity: 0;
-    transform: scale(0.95);
+    transform: translateY(12px);
   }
   to {
     opacity: 1;
-    transform: scale(1);
+    transform: translateY(0);
   }
 }
 
-.step-content {
-  animation: fadeInScale 0.4s ease-out forwards;
+.animate-step {
+  animation: fadeInUp 0.4s ease-out forwards;
 }
 
-// Table Hover Effects
-.group:hover select, .group:hover input {
-  border-color: rgba(79, 70, 229, 0.3);
-}
-
-button:disabled {
+// Number input spinner removal
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
   opacity: 0.5;
-  cursor: not-allowed;
-  filter: grayscale(1);
+}
+
+input[type="number"]:focus::-webkit-inner-spin-button,
+input[type="number"]:focus::-webkit-outer-spin-button {
+  opacity: 1;
+}
+
+// Review stat cards
+.stat-card {
+  transition: all 0.3s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+  }
+}
+
+// Manifest breakdown items
+.manifest-item {
+  transition: all 0.3s ease;
+
+  &:hover {
+    border-color: rgba(79, 70, 229, 0.2);
+  }
 }

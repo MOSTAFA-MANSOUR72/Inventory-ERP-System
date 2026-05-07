@@ -62,7 +62,7 @@ export class ContractService {
 
   create(body: {
     branch: string;
-    products: { product: string; quantity: number; buyPrice: number; sellPrice: number }[];
+    products: { product: string; quantity: number; buyPrice: number; sellPrice: number; provider: string }[];
     paymentMethod?: string;
     expectedDeliveryDate?: string;
     description?: string;

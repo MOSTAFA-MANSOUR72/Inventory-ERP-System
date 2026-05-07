@@ -69,6 +69,7 @@
                 <tr>
                   <th>Product Entity</th>
                   <th>Transaction Details</th>
+                  <th>Provider</th>
                   <th class="text-end">Subtotal</th>
                 </tr>
               </thead>
@@ -88,6 +89,9 @@
                       <span class="w-1 h-1 bg-slate-300 rounded-full"></span>
                       <span class="text-primary">{{ line.sellPrice | currency }} sell</span>
                     </div>
+                  </td>
+                  <td class="px-8 py-6">
+                    <span class="text-xs font-black text-slate-500 uppercase tracking-widest">{{ $any(line.provider)?.name ?? '—' }}</span>
                   </td>
                   <td class="px-8 py-6 text-end">
                     <p class="text-lg font-black text-slate-900">{{ (line.buyPrice * line.quantity) | currency }}</p>

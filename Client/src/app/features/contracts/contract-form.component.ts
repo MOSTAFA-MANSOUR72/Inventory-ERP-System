@@ -4,11 +4,12 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { Router } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
-import { InputComponent } from '../../shared/components/ui';
+import { InputComponent, ButtonComponent } from '../../shared/components/ui';
 import { ProductService } from '../products/product.service';
 import { ContractService } from './contract.service';
 import { AuthService } from '../../core/services/auth.service';
 import { BranchService, Branch } from '../branches/branch.service';
+import { ProviderService } from '../providers/provider.service';
 
 @Component({
   standalone: true,
@@ -18,6 +19,7 @@ import { BranchService, Branch } from '../branches/branch.service';
     NgForOf,
     ReactiveFormsModule,
     InputComponent,
+    ButtonComponent,
     MatButtonModule,
     MatSnackBarModule,
   ],
@@ -32,10 +34,12 @@ export class ContractFormComponent implements OnInit {
   private readonly snack = inject(MatSnackBar);
   readonly auth = inject(AuthService);
   private readonly branchesApi = inject(BranchService);
+  private readonly providersApi = inject(ProviderService);
 
   currentStep = 1;
   branch: Branch | null = null;
   productOptions: { _id: string; name: string }[] = [];
+  providerOptions: { _id: string; name: string }[] = [];
   
   headerForm = this.fb.nonNullable.group({
     paymentMethod: ['cash' as 'cash' | 'check' | 'credit' | 'bank_transfer'],
@@ -48,6 +52,12 @@ export class ContractFormComponent implements OnInit {
     this.productsApi.list({ limit: 100, page: 1 }).subscribe({
       next: (res) => {
         this.productOptions = res.data.products.map((p) => ({ _id: p._id, name: p.name }));
+      },
+    });
+
+    this.providersApi.list({ limit: 100 }).subscribe({
+      next: (res) => {
+        this.providerOptions = res.data.providers.map((p) => ({ _id: p._id, name: p.name }));
       },
     });
 
@@ -70,6 +80,7 @@ export class ContractFormComponent implements OnInit {
       quantity: [1, [Validators.required, Validators.min(1)]],
       buyPrice: [0, [Validators.required, Validators.min(0)]],
       sellPrice: [0, [Validators.required, Validators.min(0)]],
+      provider: ['', Validators.required],
     });
   }
 
@@ -116,6 +127,10 @@ export class ContractFormComponent implements OnInit {
     return this.productOptions.find(p => p._id === id)?.name || 'Unknown Product';
   }
 
+  getProviderName(id: string): string {
+    return this.providerOptions.find(p => p._id === id)?.name || 'Unknown Provider';
+  }
+
   submit(): void {
     if (this.headerForm.invalid || this.lines.length === 0 || this.lines.invalid) {
       this.snack.open('Please fix the errors in the form', 'OK', { duration: 3000 });
@@ -128,6 +143,7 @@ export class ContractFormComponent implements OnInit {
       quantity: l['quantity'] as number,
       buyPrice: l['buyPrice'] as number,
       sellPrice: l['sellPrice'] as number,
+      provider: l['provider'] as string,
     }));
     
     const b = this.auth.user?.branch;

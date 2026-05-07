@@ -43,6 +43,7 @@ exports.createContract = catchAsync(async (req, res, next) => {
       buyPrice: item.buyPrice,
       sellPrice: item.sellPrice,
       subtotal: subtotal,
+      provider: item.provider || undefined,
     });
   }
 
@@ -203,6 +204,7 @@ exports.updateContract = catchAsync(async (req, res, next) => {
         buyPrice: item.buyPrice,
         sellPrice: item.sellPrice,
         subtotal: subtotal,
+        provider: item.provider || undefined,
       });
     }
 

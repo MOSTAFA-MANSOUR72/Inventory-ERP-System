@@ -1,212 +1,189 @@
-# 🏭 OptiFactory ERP
+# 🏭 OptiFactory ERP - Complete Technical Documentation
 
-**OptiFactory ERP** is a state-of-the-art, full-stack enterprise resource planning system tailored for modern manufacturing and inventory environments. It features a high-performance **Node.js/Express** backend and a sleek, reactive **Angular 17** frontend, providing a seamless experience for managing branches, logistics, and sales in real-time.
+## 📋 Executive Summary
+**OptiFactory ERP** is a modern, enterprise-grade inventory and resource planning system designed specifically for multifaceted manufacturing and retail operations. It combines an ultra-fast Node.js/Express backend with a highly reactive Angular 17 frontend, empowering administrators, managers, and cashiers with real-time operational insights, localized interfaces (English/Arabic), and robust stock management.
 
 ---
 
-## ✨ Key Features
+## ✨ Core Features & Capabilities
 
-- 🏪 **Multi-Branch Operations**: Real-time synchronization and localized inventory tracking across infinite branch locations.
-- 👥 **Advanced RBAC**: Granular Role-Based Access Control (Admin, Manager, Cashier) ensuring secure operations.
-- 📦 **Dynamic Inventory**: Real-time stock tracking with automatic deductions, low-stock alerts, and multi-provider support.
-- 💰 **Profit-Centric Sales**: Intelligent sales processing with automatic profit margin calculations and historical revenue tracking.
-- 📑 **Contractual Logistics**: Full lifecycle management of purchase contracts, from pending request to inventory fulfillment.
-- 🌍 **Premium Localization**: Native support for **English and Arabic** with a pixel-perfect RTL (Right-to-Left) layout engine.
-- 💹 **Advanced Analytics**: Daily reports, top-selling product insights, and branch-level performance summaries.
+- **🏢 Multi-Branch Architecture**: Real-time synchronization and localized stock tracking across unlimited branch locations.
+- **🛡️ Granular RBAC (Role-Based Access Control)**:
+  - *Admin*: Global oversight, user provisioning, categories management.
+  - *Manager*: Branch-specific inventory management, purchase contract execution, full reporting visibility.
+  - *Cashier*: Streamlined POS (Point of Sale) transaction processing and localized receipt management.
+- **📦 Dynamic Inventory Engine**: Features auto-deductions upon sale, low-stock alerts, and integrated restocks via purchase contracts.
+- **📄 Contractual Logistics**: Full lifecycle management for purchase orders, tracking supplier (Provider) shipments until inventory fulfillment.
+- **💹 Reporting & Analytics**: Branch-level data aggregation, top-selling product discovery, and daily revenue snapshots restricted to Manager+ roles.
+- **🌍 Premier Internationalization (i18n)**: Out-of-the-box Arabic and English support with native RTL layout optimization using logical CSS properties.
 
 ---
 
 ## 🏗️ System Architecture
 
-The following diagram illustrates the high-level flow between the client application, the API server, and the database infrastructure.
+OptiFactory adopts a decoupled Client-Server architecture interacting with a document-oriented NoSQL database.
 
 ```mermaid
-graph LR
-    subgraph "Frontend (Client)"
-        UI["Angular 17 App"]
-        Design["PrintFlow UI"]
-        i18n["ngx-translate (EN/AR)"]
+graph TD
+    subgraph "Client Layer (Angular 17)"
+        UI["PrintFlow UI Components"]
+        Store["RxJS Reactive State"]
+        AuthG["Route Guards (Auth/Role)"]
+        i18n["ngx-translate (RTL/LTR)"]
     end
 
-    subgraph "Backend (Server)"
-        API["Express.js REST API"]
-        Auth["JWT Auth / RBAC"]
-        Logic["Business Logic"]
+    subgraph "API Layer (Express.js)"
+        Router["Express Routers"]
+        AuthM["JWT & RBAC Middleware"]
+        Controllers["Business Logic"]
+        Errors["Global Error Handler"]
     end
 
-    subgraph "Data Persistence"
-        DB[("MongoDB / Mongoose")]
+    subgraph "Data Persistence Layer"
+        ODM["Mongoose ODM"]
+        DB[("MongoDB Atlas")]
     end
 
-    UI <--> API
-    API <--> DB
+    UI <-->|RESTful HTTP / JSON| Router
+    Router --> AuthM
+    AuthM --> Controllers
+    Controllers <--> ODM
+    ODM <--> DB
 ```
 
 ---
 
-## 🗄️ Database Schema
+## 💻 Tech Stack Deep-Dive
 
-Our document-oriented schema is optimized for query speed and data integrity.
+### 🎨 Frontend (Client)
+- **Core Framework**: Angular 17 (utilizing Standalone Components and the new Control Flow syntax)
+- **Styling**: Tailwind CSS, extended via a bespoke UI engine named **"PrintFlow"**
+- **Design System ("PrintFlow")**: Reusable component directives (e.g., `[appInput]`, `[appButton]`) ensuring high-contrast neo-brutalist aesthetics and consistent layout.
+- **Localization**: `@ngx-translate/core` with bidirectional logical CSS formatting (using features like `ms-auto`, `pe-4`).
+- **State Management & Routing**: `RxJS`, `HttpInterceptors` (for appending bearer tokens and global error catching).
+
+### ⚙️ Backend (Server)
+- **Core Engine**: Node.js utilizing the Express.js framework
+- **Security Posture**: Helmet.js (HTTP Headers), XSS-Clean, Express Rate Limiting, and Bcrypt for aggressive password hashing.
+- **Authentication**: Stateless robust JWT implementation (access and refresh token rotation schemes).
+- **Database**: MongoDB interacting via Mongoose Object Data Modeling (ODM).
+- **Communication Pipelines**: Nodemailer configured for transactional events and Multi-part form-data parsing via Multer (for robust product image handling).
+
+---
+
+## 🗄️ Database Schema Representation
+
+The Data Model is highly optimized for fast read-heavy queries and reliable transnational modifications representing stock levels.
 
 ```mermaid
 erDiagram
-    BRANCH ||--o{ USER : manages
-    BRANCH ||--o{ INVENTORY-PRODUCT : stocks
-    USER ||--o{ PRODUCT : creates
-    USER ||--o{ CONTRACT : manages
-    USER ||--o{ RECEIPT : processes
-    CATEGORY ||--o{ PRODUCT : categorizes
-    PRODUCT ||--o{ INVENTORY-PRODUCT : instantiates
-    PROVIDER ||--o{ INVENTORY-PRODUCT : supplies
-    CONTRACT ||--o{ INVENTORY-PRODUCT : fulfills
-    RECEIPT ||--o{ INVENTORY-PRODUCT : sells
+    USERS ||--o{ BRANCHES : "assigned to"
+    USERS ||--o{ PRODUCTS : "creates"
+    BRANCHES ||--o{ INVENTORY : "maintains"
+    PRODUCTS }o--|| CATEGORIES : "belongs to"
+    PRODUCTS ||--o{ INVENTORY : "stocked as"
+    PROVIDERS ||--o{ CONTRACTS : "supplies"
+    CONTRACTS ||--o{ INVENTORY : "replenishes"
+    RECEIPTS ||--o{ INVENTORY : "deducts from"
 
-    USER {
+    USERS {
+        ObjectId _id
         string name
         string email
-        string role
+        enum role "admin, manager, cashier"
+    }
+
+    INVENTORY {
+        ObjectId _id
         ObjectId branch
-    }
-    BRANCH {
-        string name
-        string location
-    }
-    PRODUCT {
-        string name
-        string description
-        number price
-    }
-    INVENTORY-PRODUCT {
+        ObjectId product
         number quantity
         number buyPrice
         number sellPrice
     }
+
+    CONTRACTS {
+        ObjectId _id
+        enum status "pending, completed, cancelled"
+        number totalAmount
+        date expectedDeliveryDate
+    }
+
+    RECEIPTS {
+        ObjectId _id
+        string paymentMethod
+        number totalCost
+        number totalProfit
+    }
 ```
 
 ---
 
-## 🛠️ Technology Stack
+## 📱 Frontend Modules & Routing
 
-### **Frontend Architecture**
-- **Framework**: Angular 17 (Standalone Components)
-- **Styling**: Tailwind CSS with custom **PrintFlow** Design System
-- **Localization**: `@ngx-translate` for full I18n and RTL support
-- **State Management**: Reactive streams with **RxJS**
-- **Icons**: Mat-Icon & Custom SVGs
+The Client application is lazy-loaded to optimize bundle size and enforce high-performance TTI (Time to Interactive).
 
-### **Backend Architecture**
-- **Runtime**: Node.js & Express
-- **Database**: MongoDB with Mongoose ODM
-- **Security**: JWT (Access + Refresh), Bcrypt, Helmet, XSS-Clean
-- **Utilities**: Express-Rate-Limit, CatchAsync Error handling
-- **Communication**: Nodemailer for transactional emails
+### Core Feature Modules:
+1. **Auth (`/auth`)**: Login flows, Token management.
+2. **Dashboard (`/dashboard`)**: KPI metrics, animated alert systems for rapid situational awareness.
+3. **Products (`/products`)**: Centralized catalog of master items holding meta-data and taxonomy.
+4. **Inventory (`/inventory`)**: Physical stocks mapping products to unique branches with real-time value indexing.
+5. **Sales (`/sales`)**: POS system logic mapping incoming receipts immediately against branch-level inventory.
+6. **Contracts (`/contracts`)**: Purchase order origination and fulfillment tracking logic.
+7. **Reports (`/reports`)**: High-level statistical charts and printable logs (Protected by Manager Guard).
+8. **Categories, Brands, & Users**: Setup and access provisioning modules primarily mapped to Admins.
 
 ---
 
-## 👥 Roles & Permissions (RBAC)
+## 🔌 API Documentation Summary
 
-OptiFactory enforces a strict hierarchy to ensure data integrity and security.
+The system boasts over 50 RESTful endpoints optimized for JSON ingestion. Below is the structural summary of the API namespace.
 
-| Feature | Admin | Manager | Cashier |
-| :--- | :---: | :---: | :---: |
-| **Manage Branches** | ✅ | ✅ (Own Only) | ❌ |
-| **Manage Users** | ✅ | ✅ (Own Cashiers) | ❌ |
-| **Create Products** | ✅ | ✅ | ❌ |
-| **Manage Categories** | ✅ | ❌ | ❌ |
-| **Create Contracts** | ✅ | ✅ | ❌ |
-| **Approve Contracts** | ✅ | ✅ | ❌ |
-| **Process Sales** | ❌ | ❌ | ✅ |
-| **View Reports** | ✅ | ✅ | ❌ |
+### `Auth & Users`
+- `POST /api/login` - Authenticate and yield JWT Pair.
+- `POST /api/signup` - Scaffold initial administrative accounts.
+- `GET /api/me` - Self-identify user object.
 
----
+### `Catalog Management`
+- `GET/POST /api/products` - Base catalog retrieval and multipart-form data ingestion for imagery.
+- `GET/POST /api/categories` - Product taxonomy control.
 
-## 🎨 PrintFlow Design System
+### `Logistics & Logistics`
+- `GET/POST /api/branches` - Structural node mapping.
+- `GET /api/inventory` - Retrieve localized stock pools.
+- `POST /api/contracts` - Initialize restocking orders mapping Providers to Products.
+- `PATCH /api/contracts/:id/approve` - Authorize contract completion, invoking a transactional hook to restock mapped `Inventory` items.
 
-The application utilizes a proprietary UI system called **PrintFlow**, defined by:
-- **Consistent Tokens**: High-contrast dark mode and premium light mode palettes.
-- **Reusable Components**: `ButtonVariant`, `InputComponent`, `BadgeVariant`, `CardComponent`.
-- **Micro-Animations**: Smooth transitions and hover effects for a premium feel.
-- **RTL-First Design**: Logical CSS properties ensuring seamless translation between English and Arabic.
+### `Point of Sale (POS)`
+- `POST /api/sales` - Trigger atomic purchase transactions, immediately mutating `Inventory` limits to prevent over-drafting.
+- `GET /api/sales/daily-report` - Roll-up analytics of revenue metrics.
 
----
-
-## 🚀 Installation & Setup
-
-### **1. Prerequisites**
-- **Node.js** (v18 or higher)
-- **MongoDB** (Local or Atlas instance)
-- **Angular CLI** (`npm i -g @angular/cli`)
-
-### **2. Backend Configuration**
-```bash
-cd server
-npm install
-```
-Create a `.env` file in the `server` root:
-```env
-PORT=5000
-MONGODB_URI=your_mongodb_connection_string
-JWT_SECRET=your_super_secret_key
-JWT_EXPIRES_IN=90d
-JWT_REFRESH_SECRET=your_refresh_secret
-JWT_REFRESH_EXPIRES_IN=120d
-```
-Start the server:
-```bash
-npm start
-```
-
-### **3. Frontend Configuration**
-```bash
-cd Client
-npm install
-```
-Start the development server:
-```bash
-npm start
-```
-The app will be available at `http://localhost:4200`.
+*(Note: Advanced parameters such as `?page=x&limit=y&status=z` are integrated natively onto all list-retrieval mechanisms for broad pagination matching).*
 
 ---
 
-## 📖 API Documentation Summary
+## 🚀 Environment Setup & Deployment
 
-The API provides RESTful endpoints with consistent JSON responses. All protected routes require a `Bearer <token>` in the `Authorization` header.
+### 1. Requirements
+Ensure **Node v18+**, **Angular CLI 17.x**, and a running **MongoDB** daemon (or Atlas Cluster URI) are available locally.
 
-### **Authentication**
-- `POST /api/login`: Global login for all roles.
-- `POST /api/signup`: Register new managers (Admin only).
-- `POST /api/refreshToken`: Rotate JWT tokens.
+### 2. Backend Initialization
+1. Navigate to `/server`
+2. Run `npm install`
+3. Prepare a local `.env` overriding secrets:
+   ```env
+   PORT=5000
+   MONGODB_URI=your_mongodb_connection_string
+   JWT_SECRET=super_secure_jwt_hash
+   JWT_EXPIRES_IN=90d
+   ```
+4. Start process: `npm start`
 
-### **Inventory & Products**
-- `GET /api/products`: Filterable product catalog.
-- `POST /api/products`: Create new base products (Multipart/form-data support).
-- `GET /api/inventory`: Real-time stock levels for the user's branch.
+### 3. Frontend Initialization
+1. Navigate to `/Client`
+2. Run `npm install`
+3. Launch development host via `npm start`
+4. Access via [http://localhost:4200](http://localhost:4200)
 
-### **Sales & Operations**
-- `POST /api/sales`: Create a new transactional receipt.
-- `GET /api/sales/daily-report`: Aggregate sales data for the current day.
-- `PATCH /api/sales/:id/refund`: Full receipt refund and stock restoration.
-
-> [!TIP]
-> For a full list of over 50+ endpoints and detailed request/response schemas, refer to the [Internal API Documentation](file:///home/mostafa/Public/Vs%20Projects/Projects/Inventory/server/DOCUMENTATION.md).
-
----
-
-## 📦 Core Dependencies
-
-**Server-side**: `mongoose`, `jsonwebtoken`, `bcrypt`, `express-rate-limit`, `helmet`, `xss-clean`, `multer`.
-**Client-side**: `@angular/material`, `@ngx-translate/core`, `tailwindcss`, `rxjs`, `@angular/ssr`.
-
----
-
-## 🚢 Deployment Guidelines
-
-- **Database**: Use MongoDB Atlas for production-grade scaling.
-- **Frontend**: Build using `ng build --configuration production` and serve via Nginx or a CDN.
-- **Backend**: Use PM2 for process management and a reverse proxy (Nginx) with SSL.
-- **Environment**: Ensure all `JWT_SECRET` and `MONGODB_URI` variables are set in the production CI/CD environment.
-
----
-
-**OptiFactory ERP.** *Efficiency. Scalability. Perfection.*
+### 4. Continuous Deployment Recommendations
+We recommend scaling on **PM2** runtime mapping Node to a reverse proxy (Nginx). The Angular suite should compile via `ng build --configuration production` with the static `/dist` array served over a CDN edge network to ensure latency minimization.
